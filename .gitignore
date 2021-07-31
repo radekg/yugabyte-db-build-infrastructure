@@ -1,0 +1,7 @@
+.vscode/
+*.so
+**/*.bc
+**/*.o
+results/
+regression.diffs
+regression.out

@@ -1,0 +1,21 @@
+[global]
+    checkNewVersion = false
+    sendAnonymousUsage = false
+
+[entryPoints]
+    [entryPoints.masters]
+        address = ":7000"
+    [entryPoints.tservers-psql]
+        address = ":5433"
+
+[providers]
+    [providers.docker]
+        exposedByDefault = false
+
+[log]
+    level = "TRACE"
+    format = "common"
+
+[api]
+    insecure = true
+    dashboard = true

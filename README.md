@@ -44,3 +44,64 @@ make ext-installcheck
 ```
 
 This target will run the regression tests using PostgreSQL regression testing framework.
+
+## Start local YugabyteDB with Docker compose
+
+### Build YugabyteDB Docker image
+
+This image will have the _example_ extension bundled:
+
+```sh
+make ybdb-base
+```
+
+### Start the compose infrastructure
+
+In three separate terminals:
+
+```sh
+make yb-start-masters
+```
+
+This may take some time to settle. Wait until you see the `Successfully built ybclient` message.
+
+In the second terminal:
+
+```sh
+make yb-start-tservers
+```
+
+Finally, in the third terminal, start the reverse proxy:
+
+```sh
+make yb-start-traefik
+```
+
+Connect to the database:
+
+```sh
+psql "host=localhost port=5433 user=yugabyte dbname=yugabyte"
+```
+
+Create the extension:
+
+```sql
+yugabyte#=> create extension example;
+```
+```
+CREATE EXTENSION
+```
+
+List extensions:
+
+```
+yugabyte#=> \dx
+                                     List of installed extensions
+        Name        | Version |   Schema   |                        Description
+--------------------+---------+------------+-----------------------------------------------------------
+ example            | 0.1.0   | public     | Example library
+ pg_stat_statements | 1.6     | pg_catalog | track execution statistics of all SQL statements executed
+ plpgsql            | 1.0     | pg_catalog | PL/pgSQL procedural language
+(3 rows)
+
+```

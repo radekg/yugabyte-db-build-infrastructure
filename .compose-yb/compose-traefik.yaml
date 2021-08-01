@@ -1,0 +1,19 @@
+version: '3.9'
+
+networks:
+  yb:
+    name: yb
+
+services:
+
+  traefik:
+    image: traefik:2.3
+    restart: unless-stopped
+    ports:
+      - 5433:5433
+      - 7000:7000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./etc/traefik/traefik.toml:/etc/traefik/traefik.toml:ro
+    networks:
+      - yb

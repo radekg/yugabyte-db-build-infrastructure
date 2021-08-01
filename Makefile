@@ -62,7 +62,7 @@ extension-example-prepare: ext-build
 .PHONY: ybdb-base
 ybdb-base: extension-example-prepare
 	cd ${CURRENT_DIR}/.docker/yugabytedb-with-extensions \
-		&& docker build --build-arg YB_VERSION=${YB_VERSION} -t local/yugabytedb:${YB_VERSION} .
+		&& docker build --no-cache --progress=plain --build-arg YB_VERSION=${YB_VERSION} -t local/yugabytedb:${YB_VERSION} .
 
 .PHONY: yb-start-masters
 yb-start-masters:
@@ -75,3 +75,8 @@ yb-start-tservers:
 .PHONY: yb-start-traefik
 yb-start-traefik:
 	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-traefik.yaml up
+
+.PHONY: yb-compose-clean
+yb-compose-clean:
+	cd ${CURRENT_DIR}/.compose-yb \
+		&& docker compose -f compose-traefik.yaml -f compose-tservers.yaml -f compose-traefik.yaml rm

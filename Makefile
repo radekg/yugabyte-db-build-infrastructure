@@ -3,6 +3,7 @@ DATA = $(wildcard sql/*--*.sql)
 
 MODULE_big = example
 OBJS = src/example.o
+YB_VERSION=2.7.2.0-b216
 
 TESTS = $(wildcard test/sql/*.sql)
 REGRESS = $(patsubst test/sql/%.sql,%,$(TESTS))
@@ -19,7 +20,7 @@ CURRENT_DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
 .PHONY: ext-infra
 ext-infra:
-	cd ${CURRENT_DIR}/.docker \
+	cd ${CURRENT_DIR}/.docker/psql-extensions-build-infra \
 		&& docker build -t postgres-extensions-builder:11.2 .
 
 .PHONY: ext-clean
@@ -50,3 +51,27 @@ ext-installcheck:
   		-v ${CURRENT_DIR}:/extension \
 		-e POSTGRES_PASSWORD=ext-builder \
   		-ti postgres-extensions-builder:11.2 installcheck
+
+.PHONY: extension-example-prepare
+extension-example-prepare: ext-build
+	mkdir -p ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension
+	cp ${CURRENT_DIR}/example.so ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/
+	cp ${CURRENT_DIR}/example.control ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension/
+	cp ${CURRENT_DIR}/sql/*.sql ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension/
+
+.PHONY: ybdb-base
+ybdb-base: extension-example-prepare
+	cd ${CURRENT_DIR}/.docker/yugabytedb-with-extensions \
+		&& docker build --build-arg YB_VERSION=${YB_VERSION} -t local/yugabytedb:${YB_VERSION} .
+
+.PHONY: yb-start-masters
+yb-start-masters:
+	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-masters.yaml up
+
+.PHONY: yb-start-tservers
+yb-start-tservers:
+	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-tservers.yaml up
+
+.PHONY: yb-start-traefik
+yb-start-traefik:
+	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-traefik.yaml up

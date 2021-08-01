@@ -41,8 +41,8 @@ example_hook(PlannedStmt *pstmt,
     // Get the utility statement from the planned statement
     Node   *utility_stmt = pstmt->utilityStmt;
     
-    if (!superuser())
-    {
+    //if (!superuser())
+    //{
         switch (utility_stmt->type)
 		{
             case T_CreateStmt:
@@ -75,7 +75,7 @@ example_hook(PlannedStmt *pstmt,
                 // ereport(LOG, (errmsg("statement type: %d", utility_stmt->type)));
                 break;
         }
-    }
+    //}
 
     // Chain to previously defined hooks
     if (prev_hook)

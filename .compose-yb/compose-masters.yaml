@@ -1,0 +1,76 @@
+version: '3.9'
+
+networks:
+  yb:
+    name: yb
+
+services:
+
+  master1:
+    image: local/yugabytedb:2.7.2.0-b216
+    container_name: master1
+    # hostname: master1
+    networks:
+      - yb
+    command: [ "/home/yugabyte/bin/yb-master",
+      "--fs_data_dirs=/mnt/master",
+      "--enable_ysql=true",
+      "--master_addresses=master1:7100,master2:7100,master3:7100",
+      "--rpc_bind_addresses=master1:7100",
+      "--logtostderr",
+      "--replication_factor=3",
+      "--placement_cloud=docker",
+      "--placement_region=compose",
+      "--placement_zone=a"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.master1.entrypoints=masters"
+      - "traefik.tcp.routers.master1.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.master1.service=masters"
+      - "traefik.tcp.services.masters.loadbalancer.server.port=7000"
+
+  master2:
+    image: local/yugabytedb:2.7.2.0-b216
+    container_name: master2
+    # hostname: master2
+    networks:
+      - yb
+    command: [ "/home/yugabyte/bin/yb-master",
+      "--fs_data_dirs=/mnt/master",
+      "--enable_ysql=true",
+      "--master_addresses=master1:7100,master2:7100,master3:7100",
+      "--rpc_bind_addresses=master2:7100",
+      "--logtostderr",
+      "--replication_factor=3",
+      "--placement_cloud=docker",
+      "--placement_region=compose",
+      "--placement_zone=b"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.master2.entrypoints=masters"
+      - "traefik.tcp.routers.master2.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.master2.service=masters"
+      - "traefik.tcp.services.masters.loadbalancer.server.port=7000"
+
+  master3:
+    image: local/yugabytedb:2.7.2.0-b216
+    container_name: master3
+    # hostname: master3
+    networks:
+      - yb
+    command: [ "/home/yugabyte/bin/yb-master",
+      "--fs_data_dirs=/mnt/master",
+      "--enable_ysql=true",
+      "--master_addresses=master1:7100,master2:7100,master3:7100",
+      "--rpc_bind_addresses=master3:7100",
+      "--logtostderr",
+      "--replication_factor=3",
+      "--placement_cloud=docker",
+      "--placement_region=compose",
+      "--placement_zone=c"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.master3.entrypoints=masters"
+      - "traefik.tcp.routers.master3.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.master3.service=masters"
+      - "traefik.tcp.services.masters.loadbalancer.server.port=7000"

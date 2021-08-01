@@ -1,0 +1,79 @@
+version: '3.9'
+
+networks:
+  yb:
+    name: yb
+
+services:
+
+  tserver-ts1a:
+    image: local/yugabytedb:2.7.2.0-b216
+    container_name: tserver-ts1a
+    # hostname: tserver-ts1a
+    networks:
+      - yb
+    command: [ "/home/yugabyte/bin/yb-tserver",
+      "--fs_data_dirs=/mnt/tserver",
+      "--enable_ysql=true",
+      "--ysql_enable_auth=true",
+      "--logtostderr=true",
+      "--rpc_bind_addresses=tserver-ts1a:9100",
+      "--tserver_master_addrs=master1:7100,master2:7100,master3:7100",
+      "--placement_cloud=docker",
+      "--placement_region=compose",
+      "--placement_zone=a",
+      "--ysql_pg_conf=shared_preload_libraries='example'"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.tserver-ts1a.entrypoints=tservers-psql"
+      - "traefik.tcp.routers.tserver-ts1a.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.tserver-ts1a.service=tservers-psql"
+      - "traefik.tcp.services.tservers-psql.loadbalancer.server.port=5433"
+
+  tserver-ts1b:
+    image: local/yugabytedb:2.7.2.0-b216
+    container_name: tserver-ts1b
+    # hostname: tserver-ts1b
+    networks:
+      - yb
+    command: [ "/home/yugabyte/bin/yb-tserver",
+      "--fs_data_dirs=/mnt/tserver",
+      "--enable_ysql=true",
+      "--ysql_enable_auth=true",
+      "--logtostderr=true",
+      "--rpc_bind_addresses=tserver-ts1b:9100",
+      "--tserver_master_addrs=master1:7100,master2:7100,master3:7100",
+      "--placement_cloud=docker",
+      "--placement_region=compose",
+      "--placement_zone=b",
+      "--ysql_pg_conf=shared_preload_libraries='example'"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.tserver-ts1b.entrypoints=tservers-psql"
+      - "traefik.tcp.routers.tserver-ts1b.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.tserver-ts1b.service=tservers-psql"
+      - "traefik.tcp.services.tservers-psql.loadbalancer.server.port=5433"
+
+  tserver-ts1c:
+    image: local/yugabytedb:2.7.2.0-b216
+    container_name: tserver-ts1c
+    # hostname: tserver-ts1c
+    networks:
+      - yb
+    command: [ "/home/yugabyte/bin/yb-tserver",
+      "--fs_data_dirs=/mnt/tserver",
+      "--enable_ysql=true",
+      "--ysql_enable_auth=true",
+      "--logtostderr=true",
+      "--rpc_bind_addresses=tserver-ts1c:9100",
+      "--tserver_master_addrs=master1:7100,master2:7100,master3:7100",
+      "--placement_cloud=docker",
+      "--placement_region=compose",
+      "--placement_zone=c",
+      "--ysql_pg_conf=shared_preload_libraries='example'"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.tserver-ts1c.entrypoints=tservers-psql"
+      - "traefik.tcp.routers.tserver-ts1c.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.tserver-ts1c.service=tservers-psql"
+      - "traefik.tcp.services.tservers-psql.loadbalancer.server.port=5433"

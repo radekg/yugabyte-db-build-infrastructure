@@ -53,14 +53,19 @@ ext-installcheck:
   		-ti postgres-extensions-builder:11.2 installcheck
 
 .PHONY: extension-example-prepare
-extension-example-prepare: ext-build
+extension-example-prepare:
 	mkdir -p ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension
 	cp ${CURRENT_DIR}/example.so ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/
 	cp ${CURRENT_DIR}/example.control ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension/
 	cp ${CURRENT_DIR}/sql/*.sql ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension/
 
 .PHONY: ybdb-base
-ybdb-base: extension-example-prepare
+ybdb-base: ext-build extension-example-prepare
+	cd ${CURRENT_DIR}/.docker/yugabytedb-with-extensions \
+		&& docker build --no-cache --progress=plain --build-arg YB_VERSION=${YB_VERSION} -t local/yugabytedb:${YB_VERSION} .
+
+.PHONY: ybdb-base-nobuild
+ybdb-base-nobuild: extension-example-prepare
 	cd ${CURRENT_DIR}/.docker/yugabytedb-with-extensions \
 		&& docker build --no-cache --progress=plain --build-arg YB_VERSION=${YB_VERSION} -t local/yugabytedb:${YB_VERSION} .
 

@@ -9,6 +9,7 @@ services:
   master1:
     image: local/yugabytedb:2.7.2.0-b216
     container_name: master1
+    restart: unless-stopped
     # hostname: master1
     networks:
       - yb
@@ -32,6 +33,7 @@ services:
   master2:
     image: local/yugabytedb:2.7.2.0-b216
     container_name: master2
+    restart: unless-stopped
     # hostname: master2
     networks:
       - yb
@@ -55,6 +57,7 @@ services:
   master3:
     image: local/yugabytedb:2.7.2.0-b216
     container_name: master3
+    restart: unless-stopped
     # hostname: master3
     networks:
       - yb

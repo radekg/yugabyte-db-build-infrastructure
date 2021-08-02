@@ -9,6 +9,7 @@ services:
   tserver-ts1a:
     image: local/yugabytedb:2.7.2.0-b216
     container_name: tserver-ts1a
+    restart: unless-stopped
     # hostname: tserver-ts1a
     networks:
       - yb
@@ -33,6 +34,7 @@ services:
   tserver-ts1b:
     image: local/yugabytedb:2.7.2.0-b216
     container_name: tserver-ts1b
+    restart: unless-stopped
     # hostname: tserver-ts1b
     networks:
       - yb
@@ -57,6 +59,7 @@ services:
   tserver-ts1c:
     image: local/yugabytedb:2.7.2.0-b216
     container_name: tserver-ts1c
+    restart: unless-stopped
     # hostname: tserver-ts1c
     networks:
       - yb

@@ -2,6 +2,8 @@
 
 YB_VERSION=${YB_VERSION:-"v2.7.2"}
 
+cd /yb-source
+
 # reset the Makefile of the third-party extensions
 git checkout -- src/postgres/third-party-extensions/Makefile
 
@@ -27,10 +29,5 @@ else
 fi
 
 ./yb_build.sh release
-yes | ./yb_release
 
-# remove old build, if exists...
-rm -rf /yb-source/build/yugabyte-${YB_VERSION}.tar.gz
-mv /yb-source/build/yugabyte-${YB_VERSION}*.tar.gz /yb-source/build/yugabyte-${YB_VERSION}.tar.gz
-
-echo "Your build is available in /yb-source/build/yugabyte-${YB_VERSION}.tar.gz"
+echo "Your rebuild of YugabyteDB ${YB_VERSION} is complete"

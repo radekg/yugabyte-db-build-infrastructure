@@ -4,6 +4,7 @@ REPOSITORY=${REPOSITORY:-"https://github.com/yugabyte/yugabyte-db.git"}
 YB_VERSION=${YB_VERSION:-"v2.7.2"}
 
 cd /yb-source
+
 if [ ! -d "./.git" ]; then
     echo "Checking out '${REPOSITORY}'..."
     git clone "${REPOSITORY}" .
@@ -36,7 +37,5 @@ else
 fi
 
 ./yb_build.sh release
-yes | ./yb_release
-mv /yb-source/build/yugabyte-${YB_VERSION}*.tar.gz /yb-source/build/yugabyte-${YB_VERSION}.tar.gz
 
-echo "Your build is available in /yb-source/build/yugabyte-${YB_VERSION}.tar.gz"
+echo "Your first pass build of YugabyteDB ${YB_VERSION} is complete"

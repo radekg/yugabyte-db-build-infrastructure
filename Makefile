@@ -85,7 +85,9 @@ endif
 			--build-arg GROUPNAME=${YB_RELEASE_DOCKER_ARG_GROUP} \
 			--build-arg UID=${YB_RELEASE_DOCKER_ARG_UID} \
 			--build-arg USERNAME=${YB_RELEASE_DOCKER_ARG_USER} \
-			--build-arg YB_VERSION=${YB_RELEASE_VERSION} \
+			--build-arg YB_RELEASE_VERSION=${YB_RELEASE_VERSION} \
+			--build-arg YB_SOURCE_VERSION=${YB_SOURCE_VERSION} \
+			--build-arg YB_REPOSITORY=${YB_REPOSITORY} \
 			-t ${YB_RELEASE_DOCKER_TAG}:${YB_RELEASE_DOCKER_VERSION} .
 
 .PHONY: yb-start-masters

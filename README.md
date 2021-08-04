@@ -94,6 +94,9 @@ There are following configuration options available for this target:
 - `YB_RELEASE_DOCKER_TAG`: resulting Docker image tag name, default `local/yugabytedb`
 - `YB_RELEASE_DOCKER_VERSION`: resulting Docker image version, default the value of `YB_RELEASE_VERSION`
 
+- `YB_REPOSITORY`: used as the image label: YugabyteDB source repository to use, default `https://github.com/yugabyte/yugabyte-db.git`
+- `YB_SOURCE_VERSION`: used as the image label: YugabyteDB source code version: commit hash, branch name or tag name, default `v2.7.2`
+
 ## Building YugabyteDB with Postgres extensions
 
 The first pass build and rebuild allows compilation of the extensions together with YugabyteDB. Such compilations result in distributions with extension libraries already installed in the package and share directories. It is possible to `ybdb-rebuild` with extensions which did not exist in first pass build. To add extensions to the compilation process, for every extension:

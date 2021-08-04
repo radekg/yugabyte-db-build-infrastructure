@@ -8,7 +8,7 @@ ARG YB_REPOSITORY=https://github.com/yugabyte/yugabyte-db.git
 ARG YB_SOURCE_VERSION=v2.7.2
 ARG YB_RELEASE_VERSION=2.7.2.0
 
-COPY yugabyte-${YB_VERSION}.tar.gz /home/${USERNAME}/yugabyte-${YB_VERSION}.tar.gz
+COPY yugabyte-${YB_RELEASE_VERSION}.tar.gz /home/${USERNAME}/yugabyte-${YB_RELEASE_VERSION}.tar.gz
 
 LABEL YB_REPOSITORY=https://github.com/yugabyte/yugabyte-db.git \
     YB_SOURCE_VERSION=${YB_SOURCE_VERSION} \

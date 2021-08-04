@@ -75,42 +75,28 @@ ybdb-build-first-pass:
 		&& mkdir -p ${CURRENT_DIR}/.tmp/extensions \
 		&& docker run --rm -ti \
 			-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
-    		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
-    		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
+			-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
+			-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-    		local/yb-builder-toolchain:latest yb-first-pass-build.sh
+			local/yb-builder-toolchain:latest yb-first-pass-build.sh
 
 .PHONY: ybdb-rebuild
 ybdb-rebuild:
-	rm -rf ${CURRENT_DIR}/.tmp/yb-build \
-		&& rm -rf ${CURRENT_DIR}/.tmp/yb-maven \
-		&& rm -rf ${CURRENT_DIR}/.tmp/yb-source \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-build \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-maven \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-source \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/extensions \
-		&& docker run --rm -ti \
-			-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
-    		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
-    		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
-			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-    		local/yb-builder-toolchain:latest yb-rebuild.sh
+	docker run --rm -ti \
+		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
+		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
+		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
+		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
+		local/yb-builder-toolchain:latest yb-rebuild.sh
 
 .PHONY: ybdb-release
 ybdb-release:
-	rm -rf ${CURRENT_DIR}/.tmp/yb-build \
-		&& rm -rf ${CURRENT_DIR}/.tmp/yb-maven \
-		&& rm -rf ${CURRENT_DIR}/.tmp/yb-source \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-build \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-maven \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-source \
-		&& mkdir -p ${CURRENT_DIR}/.tmp/extensions \
-		&& docker run --rm -ti \
-			-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
-    		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
-    		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
-			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-    		local/yb-builder-toolchain:latest yb-release.sh
+	docker run --rm -ti \
+		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
+		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
+		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
+		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
+		local/yb-builder-toolchain:latest yb-release.sh
 
 .PHONY: ybdb-base
 ybdb-base: ext-build extension-example-prepare

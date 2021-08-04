@@ -7,3 +7,5 @@ regression.diffs
 regression.out
 .docker/yugabytedb-with-extensions/extensions
 .deps/
+.tmp/*
+!.tmp/.gitkeep

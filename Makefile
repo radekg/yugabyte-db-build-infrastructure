@@ -26,31 +26,31 @@ ext-infra:
 .PHONY: ext-clean
 ext-clean:
 	docker run --rm \
-  		-v ${CURRENT_DIR}:/extension \
+		-v ${CURRENT_DIR}:/extension \
 		-e POSTGRES_PASSWORD=ext-builder \
-  		-ti postgres-extensions-builder:11.2 clean
+		-ti postgres-extensions-builder:11.2 clean
 
 .PHONY: ext-build
 ext-build:
 	docker run --rm \
-  		-v ${CURRENT_DIR}:/extension \
+		-v ${CURRENT_DIR}:/extension \
 		-e POSTGRES_PASSWORD=ext-builder \
-  		-ti postgres-extensions-builder:11.2 build
+		-ti postgres-extensions-builder:11.2 build
 
 .PHONY: ext-run-postgres
 ext-run-postgres:
 	docker run --rm \
-  		-v ${CURRENT_DIR}:/extension \
+		-v ${CURRENT_DIR}:/extension \
 		-e POSTGRES_PASSWORD=ext-builder \
 		-p 5432:5432 \
-  		-ti postgres-extensions-builder:11.2 run
+		-ti postgres-extensions-builder:11.2 run
 
 .PHONY: ext-installcheck
 ext-installcheck:
 	docker run --rm \
-  		-v ${CURRENT_DIR}:/extension \
+		-v ${CURRENT_DIR}:/extension \
 		-e POSTGRES_PASSWORD=ext-builder \
-  		-ti postgres-extensions-builder:11.2 installcheck
+		-ti postgres-extensions-builder:11.2 installcheck
 
 .PHONY: extension-example-prepare
 extension-example-prepare:
@@ -58,6 +58,27 @@ extension-example-prepare:
 	cp ${CURRENT_DIR}/example.so ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/
 	cp ${CURRENT_DIR}/example.control ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension/
 	cp ${CURRENT_DIR}/sql/*.sql ${CURRENT_DIR}/.docker/yugabytedb-with-extensions/extensions/example/extension/
+
+.PHONY: ybdb-build-infrastructure
+ybdb-build-infrastructure:
+	cd ${CURRENT_DIR}/.docker/yugabytedb-build-infrastructure \
+		&& docker build --no-cache --progress=plain -t local/yb-builder-toolchain:latest .
+
+.PHONY: ybdb-build-first-pass
+ybdb-build-first-pass:
+	rm -rf ${CURRENT_DIR}/.tmp/yb-build \
+		&& rm -rf ${CURRENT_DIR}/.tmp/yb-maven \
+		&& rm -rf ${CURRENT_DIR}/.tmp/yb-source \
+		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-build \
+		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-maven \
+		&& mkdir -p ${CURRENT_DIR}/.tmp/yb-source \
+		&& mkdir -p ${CURRENT_DIR}/.tmp/extensions \
+		&& docker run --rm -ti \
+			-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
+    		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
+    		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
+			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
+    		local/yb-builder-toolchain:latest yb-first-pass-build.sh
 
 .PHONY: ybdb-base
 ybdb-base: ext-build extension-example-prepare

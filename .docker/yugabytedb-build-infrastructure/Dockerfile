@@ -1,0 +1,38 @@
+# 
+# YugabyteDB build steps from:
+# https://docs.yugabyte.com/latest/contribute/core-database/build-from-src-centos/
+# 
+FROM centos:7.9.2009
+
+ARG GCC_VERSION=7.3.0
+
+COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
+COPY usr/local/bin/yb-rebuild.sh /usr/local/bin/yb-rebuild.sh
+RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
+    && chmod +x /usr/local/bin/yb-rebuild.sh \
+    && echo 'YugabyteDB build tooling' \
+    && yum -y update \
+    && yum -y groupinstall 'Development Tools' \
+    && yum install -y ruby perl-Digest epel-release ccache git python2-pip python-devel python3 python3-pip python3-devel which \
+    && yum install -y cmake3 ctest3 ninja-build \
+    && yum install -y git \
+    && yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel maven \
+    && ln -s /usr/bin/cmake3 /usr/local/bin/cmake \
+    && ln -s /usr/bin/ctest3 /usr/local/bin/ctest \
+    && echo 'Updated GCC for building extensions later on' \
+    && yum install -y wget bzip2 \
+    && cd /tmp \
+    && wget http://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.gz \
+    && tar zxf gcc-${GCC_VERSION}.tar.gz \
+    && cd gcc-${GCC_VERSION} \
+    && ./contrib/download_prerequisites \
+    && ./configure --disable-multilib --enable-languages=c,c++ \
+    && make \
+    && make install \
+    && echo 'Cleanup' \
+    && yum clean all -y \
+    && rm -rf /tmp/gcc-${GCC_VERSION}
+
+VOLUME /root/.m2
+VOLUME /opt/yb-build
+VOLUME /yb-source

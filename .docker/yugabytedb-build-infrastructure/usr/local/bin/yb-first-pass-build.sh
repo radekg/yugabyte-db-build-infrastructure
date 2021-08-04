@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
-
-REPOSITORY=${REPOSITORY:-"https://github.com/yugabyte/yugabyte-db.git"}
-YB_VERSION=${YB_VERSION:-"v2.7.2"}
-
+set -eu
+# working directory
 cd /yb-source
-
+# ensure the source code
 if [ ! -d "./.git" ]; then
-    echo "Checking out '${REPOSITORY}'..."
-    git clone "${REPOSITORY}" .
+    echo "Checking out '${YB_REPOSITORY}'..."
+    git clone "${YB_REPOSITORY}" .
 else 
-    echo "'${REPOSITORY}' already checked out..."
+    echo "'${YB_REPOSITORY}' already checked out..."
 fi
-
-# reset the Makefile of the third-party extensions
-git checkout -- src/postgres/third-party-extensions/Makefile
-
-git checkout "${YB_VERSION}"
-
+# checkout the version to work with
+git checkout "${YB_SOURCE_VERSION}"
+# optionally, install extensions for compilation
 extra_extensions=""
 count=$(find /extensions/ -maxdepth 1 -type d | grep -v '^/extensions/$' | wc -l)
 if [ $count -ne 0 ]; then
@@ -28,14 +23,13 @@ if [ $count -ne 0 ]; then
         cp -v -r "$d" src/postgres/third-party-extensions/
     done
 fi
-
 if [ -z "${extra_extensions}" ]; then
     echo "There were no extra extensions to compile with..."
 else
     echo "Appending '${extra_extensions}' to src/postgres/third-party-extensions/Makefile"
     sed -i "1{s/$/${extra_extensions}/}" src/postgres/third-party-extensions/Makefile
 fi
-
+# first pass compile
 ./yb_build.sh release
-
-echo "Your first pass build of YugabyteDB ${YB_VERSION} is complete"
+# done
+echo "Your first pass build of YugabyteDB ${YB_SOURCE_VERSION} is complete"

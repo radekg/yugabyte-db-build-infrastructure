@@ -5,7 +5,7 @@
 FROM centos:7.9.2009
 
 ARG GCC_VERSION=7.3.0
-ARG MAKE_GCC_PARALLELISM=32
+ARG GCC_MAKE_PARALLELISM=32
 
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
 COPY usr/local/bin/yb-rebuild.sh /usr/local/bin/yb-rebuild.sh
@@ -31,7 +31,7 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && cd gcc-${GCC_VERSION} \
     && ./contrib/download_prerequisites \
     && ./configure --disable-multilib --enable-languages=c,c++ \
-    && make -j ${MAKE_GCC_PARALLELISM} \
+    && make -j ${GCC_MAKE_PARALLELISM} \
     && make install \
     && echo 'Cleanup' \
     && yum clean all -y \

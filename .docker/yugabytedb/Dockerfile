@@ -5,11 +5,11 @@ ARG UID=1060
 ARG USERNAME=myybuser
 ARG YB_VERSION=2.7.2.0
 
-COPY yugabyte-*.tar.gz /home/${USERNAME}/yugabyte-linux.tar.gz
+COPY yugabyte-${YB_VERSION}.tar.gz /home/${USERNAME}/yugabyte-${YB_VERSION}.tar.gz
 
 RUN groupadd -g ${GID} ${GROUPNAME} \
     && useradd -m -d /home/${USERNAME} -g ${GID} -u ${UID} -s /bin/bash ${USERNAME} \
-    && tar xvfz /home/${USERNAME}/yugabyte-linux.tar.gz -C /home/${USERNAME} --strip 1 \
+    && tar xvfz /home/${USERNAME}/yugabyte-${YB_VERSION}.tar.gz -C /home/${USERNAME} --strip 1 \
     && /home/${USERNAME}/bin/post_install.sh \
     && chown -R ${USERNAME}:${GROUPNAME} /home/${USERNAME} \
     && ln -s /home/${USERNAME}/bin/yb-admin /usr/local/bin/yb-admin \

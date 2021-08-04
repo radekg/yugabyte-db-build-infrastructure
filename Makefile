@@ -17,6 +17,7 @@ include $(PGXS)
 
 # Custom targets:
 CURRENT_DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+PLATFORM=$(shell uname -s)
 
 .PHONY: ext-infra
 ext-infra:
@@ -97,6 +98,16 @@ ybdb-release:
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
 		local/yb-builder-toolchain:latest yb-release.sh
+
+.PHONY: ybdb-build-docker
+ybdb-build-docker:
+ifeq ($(PLATFORM),Linux)
+	sudo chmod 0777 ${CURRENT_DIR}/.tmp/yb-source/build/yugabyte-*.tar.gz
+endif
+	mkdir -p ${CURRENT_DIR}/.tmp/yb-docker-build
+	cp -v ${CURRENT_DIR}/.tmp/yb-source/build/yugabyte-*.tar.gz ${CURRENT_DIR}/.tmp/yb-docker-build/
+	cp -v ${CURRENT_DIR}/.docker/yugabytedb/Dockerfile ${CURRENT_DIR}/.tmp/yb-docker-build/
+	cd ${CURRENT_DIR}/.tmp/yb-docker-build/ && docker build -t local/yugabytedb:latest .
 
 .PHONY: ybdb-base
 ybdb-base: ext-build extension-example-prepare

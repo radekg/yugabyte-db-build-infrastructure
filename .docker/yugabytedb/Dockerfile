@@ -1,0 +1,23 @@
+FROM centos:7.9.2009 as builder
+ARG GID=1060
+ARG GROUPNAME=myybuser
+ARG UID=1060
+ARG USERNAME=myybuser
+ARG YB_VERSION=2.7.2.0
+
+COPY yugabyte-*.tar.gz /home/${USERNAME}/yugabyte-linux.tar.gz
+
+RUN groupadd -g ${GID} ${GROUPNAME} \
+    && useradd -m -d /home/${USERNAME} -g ${GID} -u ${UID} -s /bin/bash ${USERNAME} \
+    && tar xvfz /home/${USERNAME}/yugabyte-linux.tar.gz -C /home/${USERNAME} --strip 1 \
+    && /home/${USERNAME}/bin/post_install.sh \
+    && chown -R ${USERNAME}:${GROUPNAME} /home/${USERNAME} \
+    && ln -s /home/${USERNAME}/bin/yb-admin /usr/local/bin/yb-admin \
+    && ln -s /home/${USERNAME}/bin/yb-ts-cli /usr/local/bin/yb-ts-cli \
+    && ln -s /home/${USERNAME}/bin/ycqlsh /usr/local/bin/ycqlsh \
+    && ln -s /home/${USERNAME}/bin/ysqlsh /usr/local/bin/ysqlsh \
+    && ln -s /home/${USERNAME}/bin/yugabyted /usr/local/bin/yugabyted \
+    && chown -R ${USERNAME}:${GROUPNAME} /usr/local/bin
+
+USER ${USERNAME}
+

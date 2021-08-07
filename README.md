@@ -175,7 +175,15 @@ Type "help" for help.
 yugabyte=#
 ```
 
-Create the extension:
+## Loading extensions
+
+Assuming:
+
+```sh
+make YB_COMPOSE_SHARED_PRELOAD_LIBRARIES=example yb-compose-start-all
+```
+
+After everything is started, connect with _psql_ to the server and run:
 
 ```sql
 yugabyte#=> create extension example;

@@ -124,7 +124,7 @@ make ybdb-base
 In three separate terminals:
 
 ```sh
-make yb-start-masters
+make yb-compose-start-masters
 ```
 
 This may take some time to settle. Wait until you see the `Successfully built ybclient` message.
@@ -132,19 +132,47 @@ This may take some time to settle. Wait until you see the `Successfully built yb
 In the second terminal:
 
 ```sh
-make yb-start-tservers
+make yb-compose-start-tservers
 ```
 
 Finally, in the third terminal, start the reverse proxy:
 
 ```sh
-make yb-start-traefik
+make yb-compose-start-traefik
 ```
 
-Connect to the database:
+#### Optionally: start everything in one go
+
+```sh
+make yb-compose-start-all
+```
+
+#### Starting with custom _shared\_preload\_library_ list
+
+For TServers only:
+
+```sh
+make YB_COMPOSE_SHARED_PRELOAD_LIBRARIES=lib1,lib2 yb-compose-start-tservers
+```
+
+For all:
+
+```sh
+make YB_COMPOSE_SHARED_PRELOAD_LIBRARIES=lib1,lib2 yb-compose-start-all
+```
+
+#### Connect to the database
 
 ```sh
 psql "host=localhost port=5433 user=yugabyte dbname=yugabyte"
+```
+
+```
+Password for user yugabyte:
+psql (13.3, server 11.2-YB-2.7.2.0-b0)
+Type "help" for help.
+
+yugabyte=#
 ```
 
 Create the extension:

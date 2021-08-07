@@ -15,6 +15,9 @@ YB_RELEASE_DOCKER_ARG_GROUP?=yb
 YB_RELEASE_DOCKER_ARG_UID?=1000
 YB_RELEASE_DOCKER_ARG_USER?=yb
 
+empty=
+YB_COMPOSE_SHARED_PRELOAD_LIBRARIES=${empty}
+
 CURRENT_DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 PLATFORM=$(shell uname -s)
 
@@ -90,19 +93,45 @@ endif
 			--build-arg YB_REPOSITORY=${YB_REPOSITORY} \
 			-t ${YB_RELEASE_DOCKER_TAG}:${YB_RELEASE_DOCKER_VERSION} .
 
-.PHONY: yb-start-masters
-yb-start-masters:
-	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-masters.yaml up
+.compose.masters.env:
+	cd ${CURRENT_DIR}/.compose-yb \
+		&& echo YB_IMAGE_TAG=${YB_RELEASE_DOCKER_TAG} > .compose.masters.env \
+		&& echo YB_IMAGE_VERSION=${YB_RELEASE_DOCKER_VERSION} >> .compose.masters.env
 
-.PHONY: yb-start-tservers
-yb-start-tservers:
-	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-tservers.yaml up
+.compose.tservers.env:
+	cd ${CURRENT_DIR}/.compose-yb \
+		&& echo YB_IMAGE_TAG=${YB_RELEASE_DOCKER_TAG} > .compose.tservers.env \
+		&& echo YB_IMAGE_VERSION=${YB_RELEASE_DOCKER_VERSION} >> .compose.tservers.env \
+		&& echo SHARED_PRELOAD_LIBRARIES="${YB_COMPOSE_SHARED_PRELOAD_LIBRARIES}" >> .compose.tservers.env
 
-.PHONY: yb-start-traefik
-yb-start-traefik:
+.PHONY: yb-compose-start-all
+yb-compose-start-all:
+	cd ${CURRENT_DIR}/.compose-yb \
+		&& docker compose \
+			-f compose-masters.yaml --env-file .compose.masters.env \
+			-f compose-tservers.yaml --env-file .compose.tservers.env \
+			-f compose-traefik.yaml up
+
+.PHONY: yb-compose-start-masters
+yb-compose-start-masters: .compose.masters.env
+	cd ${CURRENT_DIR}/.compose-yb \
+		&& docker compose \
+			-f compose-masters.yaml --env-file .compose.masters.env up
+
+.PHONY: yb-compose-start-tservers
+yb-compose-start-tservers: .compose.tservers.env
+	cd ${CURRENT_DIR}/.compose-yb \
+		&& docker compose \
+			-f compose-tservers.yaml --env-file .compose.tservers.env up
+
+.PHONY: yb-compose-start-traefik
+yb-compose-start-traefik:
 	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-traefik.yaml up
 
 .PHONY: yb-compose-clean
-yb-compose-clean:
+yb-compose-clean: .compose.masters.env .compose.tservers.env
 	cd ${CURRENT_DIR}/.compose-yb \
-		&& docker compose -f compose-traefik.yaml -f compose-tservers.yaml -f compose-traefik.yaml rm
+		&& docker compose \
+			-f compose-traefik.yaml \
+			-f compose-masters.yaml --env-file .compose.masters.env \
+			-f compose-tservers.yaml --env-file .compose.tservers.env rm

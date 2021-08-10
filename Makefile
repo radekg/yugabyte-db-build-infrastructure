@@ -15,6 +15,8 @@ YB_RELEASE_DOCKER_ARG_GROUP?=yb
 YB_RELEASE_DOCKER_ARG_UID?=1000
 YB_RELEASE_DOCKER_ARG_USER?=yb
 
+YB_POSTGRES_WITH_ICU?=true
+
 CURRENT_DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 PLATFORM=$(shell uname -s)
 
@@ -45,6 +47,7 @@ endif
 		&& docker run --rm -ti \
 			-e YB_REPOSITORY=${YB_REPOSITORY} \
 			-e YB_SOURCE_VERSION=${YB_SOURCE_VERSION} \
+			-e YB_POSTGRES_WITH_ICU=${YB_POSTGRES_WITH_ICU} \
 			-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 			-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 			-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
@@ -55,6 +58,7 @@ endif
 ybdb-rebuild:
 	docker run --rm -ti \
 		-e YB_SOURCE_VERSION=${YB_SOURCE_VERSION} \
+		-e YB_POSTGRES_WITH_ICU=${YB_POSTGRES_WITH_ICU} \
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \

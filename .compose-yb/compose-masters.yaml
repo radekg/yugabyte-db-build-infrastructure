@@ -7,7 +7,7 @@ networks:
 services:
 
   master1:
-    image: local/yugabytedb:2.7.2.0-b216
+    image: "${YB_IMAGE_TAG}:${YB_IMAGE_VERSION}"
     container_name: master1
     restart: unless-stopped
     # hostname: master1
@@ -31,7 +31,7 @@ services:
       - "traefik.tcp.services.masters.loadbalancer.server.port=7000"
 
   master2:
-    image: local/yugabytedb:2.7.2.0-b216
+    image: "${YB_IMAGE_TAG}:${YB_IMAGE_VERSION}"
     container_name: master2
     restart: unless-stopped
     # hostname: master2
@@ -55,7 +55,7 @@ services:
       - "traefik.tcp.services.masters.loadbalancer.server.port=7000"
 
   master3:
-    image: local/yugabytedb:2.7.2.0-b216
+    image: "${YB_IMAGE_TAG}:${YB_IMAGE_VERSION}"
     container_name: master3
     restart: unless-stopped
     # hostname: master3

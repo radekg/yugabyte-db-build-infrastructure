@@ -1,3 +1,4 @@
 .vscode/
 .tmp/*
 !.tmp/.gitkeep
+.compose-yb/.compose.*.env

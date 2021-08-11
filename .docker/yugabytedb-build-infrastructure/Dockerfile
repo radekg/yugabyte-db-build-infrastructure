@@ -21,15 +21,15 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && yum -y groupinstall 'Development Tools' \
     && yum install -y ruby perl-Digest epel-release ccache git python2-pip python-devel python3 python3-pip python3-devel which \
     && yum install -y cmake3 ctest3 ninja-build \
-    && yum install -y git \
+    && yum install -y git wget bzip2 \
     && yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel \
+    && echo 'Download Maven newer than default 3.0.5:' \
     && wget https://mirror.netcologne.de/apache.org/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz -P /tmp \
     && tar xf /tmp/apache-maven-3.8.1-bin.tar.gz -C /opt \
-    && ln -sfT /opt/apache-maven-3.8.1/bin/mvn /usr/bin/mvn \
+    && ln -s /opt/apache-maven-3.8.1/bin/mvn /usr/bin/mvn \
     && ln -s /usr/bin/cmake3 /usr/local/bin/cmake \
     && ln -s /usr/bin/ctest3 /usr/local/bin/ctest \
     && echo 'Updated GCC for building extensions later on' \
-    && yum install -y wget bzip2 \
     && cd /tmp \
     && wget http://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.gz \
     && tar zxf gcc-${GCC_VERSION}.tar.gz \

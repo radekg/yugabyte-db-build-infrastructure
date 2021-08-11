@@ -97,6 +97,14 @@ endif
 			--build-arg YB_REPOSITORY=${YB_REPOSITORY} \
 			-t ${YB_RELEASE_DOCKER_TAG}:${YB_RELEASE_DOCKER_VERSION} .
 
+.PHONY: ybdb-tests
+ybdb-tests:
+	docker run --rm -ti \
+		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
+		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
+		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION} /bin/bash -c 'yb-tests.sh; /bin/bash'
+
 .compose.masters.env:
 	cd ${CURRENT_DIR}/.compose-yb \
 		&& echo YB_IMAGE_TAG=${YB_RELEASE_DOCKER_TAG} > .compose.masters.env \

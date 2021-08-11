@@ -35,7 +35,7 @@ case "${1}" in
         /yb-source/yb_build.sh release --ctest
         ;;
     cxx)
-        if [ "$#" -ne 2 ]; then
+        if [ "$#" -eq 1 ]; then
             usage-cxx
         else
             if [ "$#" -eq 3 ]; then
@@ -46,20 +46,23 @@ case "${1}" in
         fi
         ;;
     java-all)
-        /yb-source/yb_build.sh release --scb --sj --java-tests
+        cd /yb-source
+        ./yb_build.sh release --sj --java-tests
         ;;
     java)
-        if [ "$#" -ne 2 ]; then
+        if [ "$#" -eq 1 ]; then
             usage-java
         else
-            /yb-source/yb_build.sh release --scb --sj --java-test "${2}"
+            cd /yb-source
+            ./yb_build.sh release --sj --java-test "${2}"
         fi
         ;;
     ysql-java)
-        if [ "$#" -ne 2 ]; then
+        if [ "$#" -eq 1 ]; then
             usage-ysql-java
         else
-            /yb-source/yb_build.sh release --java-test "${2}"
+            cd /yb-source
+            ./yb_build.sh --java-test "${2}"
         fi
         ;;
     *)

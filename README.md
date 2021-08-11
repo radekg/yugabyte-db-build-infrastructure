@@ -97,6 +97,27 @@ There are following configuration options available for this target:
 - `YB_REPOSITORY`: used as the image label: YugabyteDB source repository to use, default `https://github.com/yugabyte/yugabyte-db.git`
 - `YB_SOURCE_VERSION`: used as the image label: YugabyteDB source code version: commit hash, branch name or tag name, default `v2.7.2`
 
+### Running YugabyteDB tests
+
+```sh
+make ybdb-tests
+```
+
+This will put YugabyteDB sources in the `debug` mode to give more decent tests output. Once you have the shell available, you can run tests like this:
+
+```sh
+# all C++ tests, this may take a long time:
+yb-tests.sh cpp
+# selected C++ test:
+yb-tests.sh cxx test [ subtest ]
+# all Java tests
+yb-tests.sh java
+# selected Java test:
+yb-tests.sh java test.Class[\#testCase]
+```
+
+Once finished working with tests, to put the YugabyteDB in release mode, use the `ybdb-rebuild` target with relevant arguments.
+
 ## Building YugabyteDB with Postgres extensions
 
 The first pass build and rebuild allows compilation of the extensions together with YugabyteDB. Such compilations result in distributions with extension libraries already installed in the package and share directories. It is possible to `ybdb-rebuild` with extensions which did not exist in first pass build. To add extensions to the compilation process, for every extension:

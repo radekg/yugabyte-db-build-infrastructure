@@ -10,10 +10,12 @@ ARG GCC_MAKE_PARALLELISM=32
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
 COPY usr/local/bin/yb-rebuild.sh /usr/local/bin/yb-rebuild.sh
 COPY usr/local/bin/yb-release.sh /usr/local/bin/yb-release.sh
+COPY usr/local/bin/yb-tests.sh /usr/local/bin/yb-tests.sh
 
 RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && chmod +x /usr/local/bin/yb-rebuild.sh \
     && chmod +x /usr/local/bin/yb-release.sh \
+    && chmod +x /usr/local/bin/yb-tests.sh \
     && echo 'YugabyteDB build tooling' \
     && yum -y update \
     && yum -y groupinstall 'Development Tools' \

@@ -25,7 +25,7 @@ else
     echo "Java dependencies OK"
 fi
 cd /yb-source
-./yb_build.sh debug
+./yb_build.sh debug --sj # don't build java here, we might not need it
 
 case "${1}" in
     cpp)
@@ -44,10 +44,18 @@ case "${1}" in
         ;;
     java)
         if [ "$#" -eq 1 ]; then
-            ./yb_build.sh debug --java-tests
+            shift
+            ./yb_build.sh debug "$@" --java-tests
         else
-            ./yb_build.sh debug --java-test "${2}"
+            testpath="${2}"
+            shift
+            shift
+            ./yb_build.sh debug "$@" --java-test "${testpath}"
         fi
+        ;;
+    raw)
+        shift
+        ./yb_build.sh debug "$@"
         ;;
     *)
         usage

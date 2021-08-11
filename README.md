@@ -114,6 +114,14 @@ yb-tests.sh cxx test [ subtest ]
 yb-tests.sh java
 # selected Java test:
 yb-tests.sh java test.Class[\#testCase]
+# Raw command, passes all options to the test runner, example:
+yb-tests.sh raw --sj --scb --java-test test.Class
+```
+
+Regarding Java tests, you can pass any valid `yb_build.sh` options to `java` tests at the end of the command, example:
+
+```sh
+yb-tests.sh java test.Class --sj --scb
 ```
 
 Once finished working with tests, to put the YugabyteDB in release mode, use the `ybdb-rebuild` target with relevant arguments.

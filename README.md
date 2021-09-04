@@ -126,7 +126,7 @@ yb-tests.sh java test.Class --sj --scb
 
 Once finished working with tests, to put the YugabyteDB in release mode, use the `ybdb-rebuild` target with relevant arguments.
 
-#### debugging the debug mode build with gdb
+#### Debugging the debug mode build with gdb
 
 Start the master and TServer in separate terminals (via `docker exec -ti ... /bin/bash`):
 

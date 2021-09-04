@@ -23,6 +23,7 @@ services:
       "--placement_cloud=docker",
       "--placement_region=compose",
       "--placement_zone=a"]
+      # use instance_uuid_override=stable-uuid to force an instance rpc uuid for machine replacement survivability
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.routers.master1.entrypoints=masters"

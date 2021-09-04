@@ -100,6 +100,8 @@ endif
 .PHONY: ybdb-tests
 ybdb-tests:
 	docker run --rm -ti \
+		--cap-add=SYS_PTRACE \
+		-p "5433:5433" \
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \

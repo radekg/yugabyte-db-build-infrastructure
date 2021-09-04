@@ -126,6 +126,35 @@ yb-tests.sh java test.Class --sj --scb
 
 Once finished working with tests, to put the YugabyteDB in release mode, use the `ybdb-rebuild` target with relevant arguments.
 
+#### debugging the debug mode build with gdb
+
+Start the master and TServer in separate terminals (via `docker exec -ti ... /bin/bash`):
+
+```
+rm -rf /tmp/yb/master
+mkdir -p /tmp/yb/master
+/yb-source/build/latest/bin/yb-master --master_addresses=127.0.0.1:7100 --replication_factor=1 --fs_data_dirs=/tmp/yb/master --logtostderr=true
+```
+
+```
+rm -rf /tmp/yb/tserver
+mkdir -p /tmp/yb/tserver
+/yb-source/build/latest/bin/yb-tserver --tserver_master_addrs=127.0.0.1:7100 --ysql_enable_auth --fs_data_dirs=/tmp/yb/tserver --logtostderr=true
+```
+
+In another terminal, start GDB:
+
+```
+set auto-load safe-path /
+attach <pid of master, tserver or postgres>
+```
+
+Set some breakpoints, for example:
+
+```
+break yb::pggate::PgTableDesc::FindColumn(int)
+```
+
 ## Building YugabyteDB with Postgres extensions
 
 The first pass build and rebuild allows compilation of the extensions together with YugabyteDB. Such compilations result in distributions with extension libraries already installed in the package and share directories. It is possible to `ybdb-rebuild` with extensions which did not exist in first pass build. To add extensions to the compilation process, for every extension:

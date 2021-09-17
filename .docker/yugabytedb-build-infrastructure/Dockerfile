@@ -4,7 +4,7 @@
 # 
 FROM centos:7.9.2009
 
-ARG GCC_VERSION=7.3.0
+ARG GCC_VERSION=8.5.0
 ARG GCC_MAKE_PARALLELISM=32
 
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh

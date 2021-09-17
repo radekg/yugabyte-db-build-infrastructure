@@ -17,8 +17,7 @@ make ybdb-build-infrastructure
 This command creates a base Docker image with all the tools required to build YugabyteDB later on. Configuration:
 
 - `YB_BUILD_INFRASTRUCTURE_DOCKER_TAG`: build infrastructure Docker image tag, default `local/yb-builder-toolchain`
-- `YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION`: build infrastructure Docker image version, default `latest`
-- `YB_BUILD_INFRASTRUCTURE_GCC_VERSION`: gcc version to install in the image, default `7.3.0`
+- `YB_BUILD_INFRASTRUCTURE_GCC_VERSION`: gcc version to install in the image, default `8.5.0`, used for Docker image tag version
 - `YB_BUILD_INFRASTRUCTURE_GCC_PARALLELISM`: the `-j` value for gcc `make`, default `32`
 
 To build with a different Docker tag, different gcc version and `make -j 4`, call:

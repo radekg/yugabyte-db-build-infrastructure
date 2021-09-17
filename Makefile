@@ -56,7 +56,7 @@ endif
 			-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 			-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-			${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION} yb-first-pass-build.sh
+			${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-first-pass-build.sh
 
 .PHONY: ybdb-rebuild
 ybdb-rebuild:
@@ -67,7 +67,7 @@ ybdb-rebuild:
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION} yb-rebuild.sh
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-rebuild.sh
 
 .PHONY: ybdb-distribution
 ybdb-distribution:
@@ -77,7 +77,7 @@ ybdb-distribution:
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION} yb-release.sh
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-release.sh
 
 .PHONY: ybdb-build-docker
 ybdb-build-docker:
@@ -106,7 +106,7 @@ ybdb-tests:
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION} /bin/bash -c 'yb-tests.sh; /bin/bash'
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} /bin/bash -c 'yb-tests.sh; /bin/bash'
 
 .compose.masters.env:
 	cd ${CURRENT_DIR}/.compose-yb \

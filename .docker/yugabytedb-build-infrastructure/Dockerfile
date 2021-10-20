@@ -7,15 +7,19 @@ FROM centos:7.9.2009
 ARG GCC_VERSION=8.5.0
 ARG GCC_MAKE_PARALLELISM=32
 
+COPY usr/local/bin/patch_postgres_h.sh /usr/local/bin/patch_postgres_h.sh
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
+COPY usr/local/bin/yb-rebuild-extensions.sh /usr/local/bin/yb-rebuild-extensions.sh
 COPY usr/local/bin/yb-rebuild.sh /usr/local/bin/yb-rebuild.sh
 COPY usr/local/bin/yb-release.sh /usr/local/bin/yb-release.sh
 COPY usr/local/bin/yb-tests.sh /usr/local/bin/yb-tests.sh
 
 RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
+    && chmod +x /usr/local/bin/yb-rebuild-extensions.sh \
     && chmod +x /usr/local/bin/yb-rebuild.sh \
     && chmod +x /usr/local/bin/yb-release.sh \
     && chmod +x /usr/local/bin/yb-tests.sh \
+    && chmod +x /usr/local/bin/ypatch_postgres_h.sh \
     && echo 'YugabyteDB build tooling' \
     && yum -y update \
     && yum -y groupinstall 'Development Tools' \

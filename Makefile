@@ -58,6 +58,17 @@ endif
 			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
 			${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-first-pass-build.sh
 
+.PHONY: ybdb-rebuild-extensions
+ybdb-rebuild-extensions:
+	docker run --rm -ti \
+		-e YB_SOURCE_VERSION=${YB_SOURCE_VERSION} \
+		-e YB_POSTGRES_WITH_ICU=${YB_POSTGRES_WITH_ICU} \
+		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
+		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
+		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
+		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-rebuild-extensions.sh
+
 .PHONY: ybdb-rebuild
 ybdb-rebuild:
 	docker run --rm -ti \

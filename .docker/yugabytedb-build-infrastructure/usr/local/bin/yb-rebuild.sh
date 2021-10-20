@@ -24,6 +24,8 @@ else
     echo "Appending '${extra_extensions}' to src/postgres/third-party-extensions/Makefile"
     sed -i "1{s/$/${extra_extensions}/}" src/postgres/third-party-extensions/Makefile
 fi
+# patch postgres.h
+/usr/local/bin/patch_postgres_h.sh
 # recompile
 ./yb_build.sh release
 # done

@@ -61,6 +61,14 @@ There are following configuration options available for this target:
 - `YB_BUILD_INFRASTRUCTURE_DOCKER_TAG`: build infrastructure Docker image tag, default `local/yb-builder-toolchain`
 - `YB_BUILD_INFRASTRUCTURE_DOCKER_VERSION`: build infrastructure Docker image version, default `latest`
 
+### Rebuild third-party extensions
+
+Regular rebuild process does not rebuild third-party extensions. To rebuild third-party extensions, run:
+
+```sh
+make ybdb-rebuild-extensions
+```
+
 ### Create a release distribution
 
 This target creates a distribution _tar.gz_ archive from the previous first pass or rebuild result.

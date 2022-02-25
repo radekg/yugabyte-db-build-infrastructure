@@ -26,7 +26,7 @@ else
 fi
 # patch postgres.h
 /usr/local/bin/patch_postgres_h.sh
-# rebuild extensions only:
-./yb_build.sh --clean-thirdparty
+# recompile
+./yb_build.sh release --clang12
 # done
-echo "Your rebuild of YugabyteDB third-party for ${YB_SOURCE_VERSION} is complete"
+echo "Your rebuild of YugabyteDB ${YB_SOURCE_VERSION} is complete"

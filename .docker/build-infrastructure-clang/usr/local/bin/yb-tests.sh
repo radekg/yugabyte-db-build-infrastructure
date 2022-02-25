@@ -25,37 +25,37 @@ else
     echo "Java dependencies OK"
 fi
 cd /yb-source
-./yb_build.sh debug --sj # don't build java here, we might not need it
+./yb_build.sh debug --clang12 --sj # don't build java here, we might not need it
 
 case "${1}" in
     cpp)
-        ./yb_build.sh debug --ctest
+        ./yb_build.sh debug --ctest --clang12
         ;;
     cxx)
         if [ "$#" -eq 1 ]; then
             usage-cxx
         else
             if [ "$#" -eq 3 ]; then
-                ./yb_build.sh debug --cxx-test "${2}" --gtest_filter "${3}"
+                ./yb_build.sh debug --clang12 --cxx-test "${2}" --gtest_filter "${3}"
             else
-                ./yb_build.sh debug --cxx-test "${2}"
+                ./yb_build.sh debug --clang12 --cxx-test "${2}"
             fi
         fi
         ;;
     java)
         if [ "$#" -eq 1 ]; then
             shift
-            ./yb_build.sh debug "$@" --java-tests
+            ./yb_build.sh debug "$@" --clang12 --java-tests
         else
             testpath="${2}"
             shift
             shift
-            ./yb_build.sh debug "$@" --java-test "${testpath}"
+            ./yb_build.sh debug "$@" --clang12 --java-test "${testpath}"
         fi
         ;;
     raw)
         shift
-        ./yb_build.sh debug "$@"
+        ./yb_build.sh debug "$@" --clang12
         ;;
     *)
         usage

@@ -19,7 +19,7 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && chmod +x /usr/local/bin/yb-rebuild.sh \
     && chmod +x /usr/local/bin/yb-release.sh \
     && chmod +x /usr/local/bin/yb-tests.sh \
-    && chmod +x /usr/local/bin/ypatch_postgres_h.sh \
+    && chmod +x /usr/local/bin/patch_postgres_h.sh \
     && echo 'YugabyteDB build tooling' \
     && dnf update -y \
     && dnf group install "Development Tools" -y \

@@ -42,7 +42,7 @@ ybdb-build-infrastructure-clang:
 
 .PHONY: ybdb-build-infrastructure-gcc
 ybdb-build-infrastructure-gcc:
-	cd ${CURRENT_DIR}/.docker/yugabytedb-build-infrastructure \
+	cd ${CURRENT_DIR}/.docker/build-infrastructure-gcc \
 		&& docker build --no-cache \
 			--build-arg GCC_VERSION=${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} \
 			--build-arg GCC_MAKE_PARALLELISM=${YB_BUILD_INFRASTRUCTURE_GCC_MAKE_PARALLELISM} \

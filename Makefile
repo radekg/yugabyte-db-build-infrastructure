@@ -114,7 +114,7 @@ ifeq ($(PLATFORM),Linux)
 endif
 	mkdir -p ${CURRENT_DIR}/.tmp/yb-docker-build \
 		&& cp -v ${CURRENT_DIR}/.tmp/yb-source/build/yugabyte-*.tar.gz ${CURRENT_DIR}/.tmp/yb-docker-build/ \
-		&& cp -v ${CURRENT_DIR}/.docker/yugabytedb/Dockerfile ${CURRENT_DIR}/.tmp/yb-docker-build/ \
+		&& cp -v ${CURRENT_DIR}/.docker/yugabyte-db/Dockerfile ${CURRENT_DIR}/.tmp/yb-docker-build/ \
 		&& cd ${CURRENT_DIR}/.tmp/yb-docker-build/ \
 		&& docker build \
 			--build-arg GID=${YB_RELEASE_DOCKER_ARG_GID} \

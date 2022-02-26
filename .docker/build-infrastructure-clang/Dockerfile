@@ -24,6 +24,8 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && dnf update -y \
     && dnf group install "Development Tools" -y \
     && dnf install bzip2 clang cmake curl java-1.8.0-openjdk java-1.8.0-openjdk-devel libatomic python3 python3-pip python3-devel rsync wget -y \
+    && echo 'Enabling required locale for tests' \
+    && dnf install langpacks-en glibc-all-langpacks -y \
     && wget https://dlcdn.apache.org/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz -P /tmp \
     && tar xf /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz -C /opt \
     && ln -s /opt/apache-maven-${MVN_VERSION}/bin/mvn /usr/bin/mvn

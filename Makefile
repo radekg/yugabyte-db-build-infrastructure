@@ -1,13 +1,23 @@
-YB_BUILD_INFRASTRUCTURE_DOCKER_TAG?=local/yb-builder-toolchain
-YB_BUILD_INFRASTRUCTURE_GCC_VERSION?=8.5.0
+YB_BUILD_INFRASTRUCTURE_DOCKER_TAG?=local/yugabyte-db-build-infrastructure
+
+# clang build infrastructure
+YB_BUILD_INFRASTRUCTURE_CLANG_TAG?=clang
+YB_BUILD_INFRASTRUCTURE_CLANG_VERSION?=12
+
+# GCC build infrastructure
+YB_BUILD_INFRASTRUCTURE_GCC_TAG?=gcc
+YB_BUILD_INFRASTRUCTURE_GCC_VERSION?=9.4.0
 YB_BUILD_INFRASTRUCTURE_GCC_MAKE_PARALLELISM?=32
 
+# By default, use clang-12 build 
+USE_BUILD_INFRASTRUCTURE?=clang12
+
 YB_REPOSITORY?=https://github.com/yugabyte/yugabyte-db.git
-YB_SOURCE_VERSION?=v2.7.2
+YB_SOURCE_VERSION?=v2.11.2
 
-YB_RELEASE_VERSION?=2.7.2.0
+YB_RELEASE_VERSION?=2.11.2.0
 
-YB_RELEASE_DOCKER_TAG?=local/yugabytedb
+YB_RELEASE_DOCKER_TAG?=local/yugabyte-db
 YB_RELEASE_DOCKER_VERSION?=${YB_RELEASE_VERSION}
 YB_RELEASE_DOCKER_ARG_GID?=1000
 YB_RELEASE_DOCKER_ARG_GROUP?=yb
@@ -22,16 +32,23 @@ YB_COMPOSE_SHARED_PRELOAD_LIBRARIES?=${empty}
 CURRENT_DIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 PLATFORM=$(shell uname -s)
 
-.PHONY: ybdb-build-infrastructure
-ybdb-build-infrastructure:
-	cd ${CURRENT_DIR}/.docker/yugabytedb-build-infrastructure \
-		&& docker build \
-			--no-cache --progress=plain \
+.PHONY: ybdb-build-infrastructure-clang
+ybdb-build-infrastructure-clang:
+	cd ${CURRENT_DIR}/.docker/build-infrastructure-clang \
+		&& docker build --no-cache \
+			-t ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_CLANG_TAG}${YB_BUILD_INFRASTRUCTURE_CLANG_VERSION} . \
+		&& docker tag ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_CLANG_TAG}${YB_BUILD_INFRASTRUCTURE_CLANG_VERSION} \
+					  ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_CLANG_TAG}-latest
+
+.PHONY: ybdb-build-infrastructure-gcc
+ybdb-build-infrastructure-gcc:
+	cd ${CURRENT_DIR}/.docker/build-infrastructure-gcc \
+		&& docker build --no-cache \
 			--build-arg GCC_VERSION=${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} \
 			--build-arg GCC_MAKE_PARALLELISM=${YB_BUILD_INFRASTRUCTURE_GCC_MAKE_PARALLELISM} \
-			-t ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} . \
-		&& docker tag ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} \
-					  ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:latest
+			-t ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_TAG}${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} . \
+		&& docker tag ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_TAG}${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} \
+					  ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_TAG}-latest
 
 .PHONY: ybdb-build-first-pass
 ybdb-build-first-pass:
@@ -56,7 +73,7 @@ endif
 			-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 			-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 			-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-			${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-first-pass-build.sh
+			${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${USE_BUILD_INFRASTRUCTURE} yb-first-pass-build.sh
 
 .PHONY: ybdb-rebuild-extensions
 ybdb-rebuild-extensions:
@@ -67,7 +84,7 @@ ybdb-rebuild-extensions:
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-rebuild-extensions.sh
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${USE_BUILD_INFRASTRUCTURE} yb-rebuild-extensions.sh
 
 .PHONY: ybdb-rebuild
 ybdb-rebuild:
@@ -78,7 +95,7 @@ ybdb-rebuild:
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-rebuild.sh
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${USE_BUILD_INFRASTRUCTURE} yb-rebuild.sh
 
 .PHONY: ybdb-distribution
 ybdb-distribution:
@@ -88,7 +105,7 @@ ybdb-distribution:
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
 		-v ${CURRENT_DIR}/.tmp/extensions:/extensions \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} yb-release.sh
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${USE_BUILD_INFRASTRUCTURE} yb-release.sh
 
 .PHONY: ybdb-build-docker
 ybdb-build-docker:
@@ -97,7 +114,7 @@ ifeq ($(PLATFORM),Linux)
 endif
 	mkdir -p ${CURRENT_DIR}/.tmp/yb-docker-build \
 		&& cp -v ${CURRENT_DIR}/.tmp/yb-source/build/yugabyte-*.tar.gz ${CURRENT_DIR}/.tmp/yb-docker-build/ \
-		&& cp -v ${CURRENT_DIR}/.docker/yugabytedb/Dockerfile ${CURRENT_DIR}/.tmp/yb-docker-build/ \
+		&& cp -v ${CURRENT_DIR}/.docker/yugabyte-db/Dockerfile ${CURRENT_DIR}/.tmp/yb-docker-build/ \
 		&& cd ${CURRENT_DIR}/.tmp/yb-docker-build/ \
 		&& docker build \
 			--build-arg GID=${YB_RELEASE_DOCKER_ARG_GID} \
@@ -117,47 +134,4 @@ ybdb-tests:
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/yb-source:/yb-source \
-		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_GCC_VERSION} /bin/bash -c 'yb-tests.sh; /bin/bash'
-
-.compose.masters.env:
-	cd ${CURRENT_DIR}/.compose-yb \
-		&& echo YB_IMAGE_TAG=${YB_RELEASE_DOCKER_TAG} > .compose.masters.env \
-		&& echo YB_IMAGE_VERSION=${YB_RELEASE_DOCKER_VERSION} >> .compose.masters.env
-
-.compose.tservers.env:
-	cd ${CURRENT_DIR}/.compose-yb \
-		&& echo YB_IMAGE_TAG=${YB_RELEASE_DOCKER_TAG} > .compose.tservers.env \
-		&& echo YB_IMAGE_VERSION=${YB_RELEASE_DOCKER_VERSION} >> .compose.tservers.env \
-		&& echo SHARED_PRELOAD_LIBRARIES="${YB_COMPOSE_SHARED_PRELOAD_LIBRARIES}" >> .compose.tservers.env
-
-.PHONY: yb-compose-start-all
-yb-compose-start-all:
-	cd ${CURRENT_DIR}/.compose-yb \
-		&& docker compose \
-			-f compose-masters.yaml --env-file .compose.masters.env \
-			-f compose-tservers.yaml --env-file .compose.tservers.env \
-			-f compose-traefik.yaml up
-
-.PHONY: yb-compose-start-masters
-yb-compose-start-masters: .compose.masters.env
-	cd ${CURRENT_DIR}/.compose-yb \
-		&& docker compose \
-			-f compose-masters.yaml --env-file .compose.masters.env up
-
-.PHONY: yb-compose-start-tservers
-yb-compose-start-tservers: .compose.tservers.env
-	cd ${CURRENT_DIR}/.compose-yb \
-		&& docker compose \
-			-f compose-tservers.yaml --env-file .compose.tservers.env up
-
-.PHONY: yb-compose-start-traefik
-yb-compose-start-traefik:
-	cd ${CURRENT_DIR}/.compose-yb && docker compose -f compose-traefik.yaml up
-
-.PHONY: yb-compose-clean
-yb-compose-clean: .compose.masters.env .compose.tservers.env
-	cd ${CURRENT_DIR}/.compose-yb \
-		&& docker compose \
-			-f compose-traefik.yaml \
-			-f compose-masters.yaml --env-file .compose.masters.env \
-			-f compose-tservers.yaml --env-file .compose.tservers.env rm
+		${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${USE_BUILD_INFRASTRUCTURE} /bin/bash -c 'yb-tests.sh; /bin/bash'

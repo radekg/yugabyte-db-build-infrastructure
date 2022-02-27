@@ -2,13 +2,8 @@
 set -eu
 # working directory
 cd /yb-source
-# ensure the source code
-if [ ! -d "./.git" ]; then
-    echo "Checking out '${YB_REPOSITORY}'..."
-    git clone "${YB_REPOSITORY}" .
-else 
-    echo "'${YB_REPOSITORY}' already checked out..."
-fi
+# reset the Makefile of the third-party extensions
+git checkout -- src/postgres/third-party-extensions/Makefile
 # checkout the version to work with
 git checkout "${YB_SOURCE_VERSION}"
 # optionally, install extensions for compilation
@@ -31,7 +26,7 @@ else
 fi
 # patch postgres.h
 /usr/local/bin/patch_postgres_h.sh
-# first pass compile
-./yb_build.sh release
+# rebuild extensions only:
+./yb_build.sh release --clang12 --clean-thirdparty
 # done
-echo "Your first pass build of YugabyteDB ${YB_SOURCE_VERSION} is complete"
+echo "Your rebuild of YugabyteDB third-party for ${YB_SOURCE_VERSION} is complete"

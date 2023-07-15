@@ -50,6 +50,8 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && echo "Enable locale required for tests" \
     && dnf install -y langpacks-en glibc-all-langpacks glibc-langpack-en glibc-locale-source \
     && localedef --no-archive -i en_US -f UTF-8 en_US.UTF-8 \
+    && echo "Yugabyted-ui: release support" \
+    && dnf install -y npm golang \
     && echo 'Cleanup' \
     && dnf clean all -y
 

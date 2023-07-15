@@ -32,6 +32,8 @@ fi
 # patch postgres.h
 /usr/local/bin/patch_postgres_h.sh
 # first pass compile
-./yb_build.sh release --gcc
+[ -n "${YB_CONFIGURED_COMPILER_TYPE}" ] && export YB_COMPILER_TYPE=${YB_CONFIGURED_COMPILER_TYPE}
+[ -n "${YB_CONFIGURED_COMPILER_ARCH}" ] && export YB_TARGET_ARCH=${YB_CONFIGURED_COMPILER_ARCH}
+./yb_build.sh release
 # done
 echo "Your first pass build of YugabyteDB ${YB_SOURCE_VERSION} is complete"

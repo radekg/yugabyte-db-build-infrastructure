@@ -27,6 +27,8 @@ fi
 # patch postgres.h
 /usr/local/bin/patch_postgres_h.sh
 # rebuild extensions only:
-./yb_build.sh release --gcc --clean-thirdparty
+[ -n "${YB_CONFIGURED_COMPILER_TYPE}" ] && export YB_COMPILER_TYPE=${YB_CONFIGURED_COMPILER_TYPE}
+[ -n "${YB_CONFIGURED_COMPILER_ARCH}" ] && export YB_TARGET_ARCH=${YB_CONFIGURED_COMPILER_ARCH}
+./yb_build.sh release  --clean-thirdparty
 # done
 echo "Your rebuild of YugabyteDB third-party for ${YB_SOURCE_VERSION} is complete"

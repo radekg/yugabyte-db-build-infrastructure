@@ -1,12 +1,14 @@
 # 
 # YugabyteDB build steps from:
-# https://docs.yugabyte.com/latest/contribute/core-database/build-from-src-centos/
+# https://docs.yugabyte.com/preview/contribute/core-database/build-from-src-almalinux/
 # 
-FROM centos:7.9.2009
+FROM almalinux:8.8
 
-ARG GCC_VERSION=9.4.0
-ARG GCC_MAKE_PARALLELISM=32
-ARG MVN_VERSION=3.8.4
+# Maven 3.9.x apparently has breaking changes,
+# end effect is, with 3.9.x, java build doesn't work - build hangs at random places.
+
+ARG GCC_VERSION=11
+ARG PYTHON_VERSION=39
 
 COPY usr/local/bin/patch_postgres_h.sh /usr/local/bin/patch_postgres_h.sh
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
@@ -22,31 +24,37 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && chmod +x /usr/local/bin/yb-tests.sh \
     && chmod +x /usr/local/bin/patch_postgres_h.sh \
     && echo 'YugabyteDB build tooling' \
-    && yum -y update \
-    && yum -y groupinstall 'Development Tools' \
-    && yum install -y ruby perl-Digest epel-release ccache git python2-pip python-devel python3 python3-pip python3-devel which \
-    && yum install -y cmake3 ctest3 ninja-build \
-    && yum install -y git wget bzip2 \
-    && yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel \
+    && dnf -y update \
+    && dnf -y groupinstall 'Development Tools' \
+    && dnf install -y epel-release libatomic rsync \
+    && dnf install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-devel \
+    && dnf install -y cmake3 \
+    && dnf install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel \
+    && echo 'Additional programs' \
+    && dnf install -y bzip2 git jq wget which \
+    && echo 'Latest Ninja' \
+    && export latest_ninja_download=$(curl -Ls "https://api.github.com/repos/ninja-build/ninja/releases/latest" | jq '.assets[] | select(.name == "ninja-linux.zip") | .browser_download_url' -r) \
+    && curl -Ls "$latest_ninja_download" | zcat | tee /usr/local/bin/ninja >/dev/null \
+    && chmod +x /usr/local/bin/ninja \
     && echo 'Download Maven newer than default 3.0.5:' \
-    && wget https://dlcdn.apache.org/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz -P /tmp \
-    && tar xf /tmp/apache-maven-${MVN_VERSION}-bin.tar.gz -C /opt \
-    && ln -s /opt/apache-maven-${MVN_VERSION}/bin/mvn /usr/bin/mvn \
+    && export latest_38_maven=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/apache/maven/tags | jq '[ .[] | select(.name | startswith("maven-3.8")) ] | .[0].name' -r | sed 's/maven-//') \
+    && wget https://dlcdn.apache.org/maven/maven-3/${latest_38_maven}/binaries/apache-maven-${latest_38_maven}-bin.tar.gz -P /tmp \
+    && tar xf /tmp/apache-maven-${latest_38_maven}-bin.tar.gz -C /opt \
+    && ln -s /opt/apache-maven-${latest_38_maven}/bin/mvn /usr/bin/mvn \
     && ln -s /usr/bin/cmake3 /usr/local/bin/cmake \
     && ln -s /usr/bin/ctest3 /usr/local/bin/ctest \
-    && echo 'Updated GCC for building extensions later on' \
-    && cd /tmp \
-    && wget http://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.gz \
-    && tar zxf gcc-${GCC_VERSION}.tar.gz \
-    && cd gcc-${GCC_VERSION} \
-    && ./contrib/download_prerequisites \
-    && ./configure --disable-multilib --enable-languages=c,c++ \
-    && make -j ${GCC_MAKE_PARALLELISM} \
-    && make install \
+    && echo "Compiler: GCC and libatomic toolset" \
+    && dnf install -y gcc-toolset-${GCC_VERSION} gcc-toolset-${GCC_VERSION}-libatomic-devel \
+    && echo "Compiler: clang" \
+    && dnf install -y clang clang-tools-extra \
+    && echo "Enable locale required for tests" \
+    && dnf install -y langpacks-en glibc-all-langpacks glibc-langpack-en glibc-locale-source \
+    && localedef --no-archive -i en_US -f UTF-8 en_US.UTF-8 \
     && echo 'Cleanup' \
-    && yum clean all -y \
-    && rm -rf /tmp/gcc-${GCC_VERSION}
+    && dnf clean all -y
 
+VOLUME /extensions
 VOLUME /root/.m2
 VOLUME /opt/yb-build
 VOLUME /yb-source
+VOLUME /yb-build-cache

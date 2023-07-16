@@ -184,6 +184,15 @@ ybdb-rebuild:
 # Build a distribution:
 # ---------------------
 
+.PHONY: ybdb-distribution-clang
+ybdb-distribution-clang:
+# Use the default clang version available in the build infrastructure:
+	$(MAKE) ybdb-distribution
+
+.PHONY: ybdb-distribution-gcc
+ybdb-distribution-gcc:
+	$(MAKE) USE_COMPILER_TYPE=gcc${GCC_VERSION} ybdb-distribution
+
 .PHONY: ybdb-distribution
 ybdb-distribution:
 	docker run --rm -ti \

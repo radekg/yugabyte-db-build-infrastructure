@@ -10,6 +10,7 @@ FROM almalinux:8.8
 ARG GCC_VERSION=11
 ARG PYTHON_VERSION=39
 
+COPY patches/ /patches
 COPY usr/local/bin/patch_postgres_h.sh /usr/local/bin/patch_postgres_h.sh
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
 COPY usr/local/bin/yb-rebuild-extensions.sh /usr/local/bin/yb-rebuild-extensions.sh

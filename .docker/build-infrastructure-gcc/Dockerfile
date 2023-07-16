@@ -52,6 +52,10 @@ RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && localedef --no-archive -i en_US -f UTF-8 en_US.UTF-8 \
     && echo "Yugabyted-ui: release support" \
     && dnf install -y npm golang \
+    && echo "Yugabyted-ui: install patchelf: https://github.com/yugabyte/yugabyte-db/issues/18258" \
+    && mkdir -p /tmp/patchelf && cd /tmp/patchelf && git clone https://github.com/NixOS/patchelf.git . \
+    && ./bootstrap.sh && ./configure && make && make install \
+    && cd - && rm -rf /tmp/patchelf \
     && echo 'Cleanup' \
     && dnf clean all -y
 

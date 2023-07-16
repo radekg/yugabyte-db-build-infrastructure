@@ -210,3 +210,11 @@ git clone <extension git repository> .
 ```
 
 Then simply execute first pass build or rebuild.
+
+## Caveats: additional context
+
+### Why is patchelf installed in the infrastructure image
+
+During a release build the `yugabyted-ui` _build.sh_ program uses a system-wide `patchelf` and `ldd`. `ldd` comes preinstalled and `patchelf` needs to be added. An alternative would be to configure the `$PATH` so that linuxbrew copies are in effect. Preferably the build.sh program should be modified to pick up the path from the downloaded linuxbrew.
+
+Tracking issue: https://github.com/yugabyte/yugabyte-db/issues/18258.

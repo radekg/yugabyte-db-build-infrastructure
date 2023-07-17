@@ -1,0 +1,51 @@
+diff --git a/python/yugabyte/library_packager.py b/python/yugabyte/library_packager.py
+index 0bf9b386b7..377402bab1 100644
+--- a/python/yugabyte/library_packager.py
++++ b/python/yugabyte/library_packager.py
+@@ -281,6 +281,7 @@ class LibraryPackager:
+ 
+         if using_linuxbrew():
+             # In Linuxbrew mode, we will set the rp
++            subprocess.check_call(['chmod', 'u+w', file_path])
+             remove_rpath(file_path)
+             return
+ 
+@@ -288,6 +289,7 @@ class LibraryPackager:
+         new_rpath = ':'.join(LibraryPackager.get_relative_rpath_items(
+                     dest_root_dir, os.path.dirname(file_abs_path)))
+         logging.info("Setting rpath on file %s to %s", file_path, new_rpath)
++        subprocess.check_call(['chmod', 'u+w', file_path])
+         set_rpath(file_path, new_rpath)
+ 
+     def install_dyn_linked_binary(self, src_path: str, dest_dir: str) -> str:
+@@ -647,6 +649,20 @@ class LibraryPackager:
+         with open(post_install_path, 'w') as post_install_script_output:
+             post_install_script_output.write(new_post_install_script)
+ 
++    @staticmethod
++    def is_elf(file_path: str) -> bool:
++        # This is an atomic option but on slow filesystms we do get 0777 and then permissions change.
++        # Check the file header and only progress if it's an ELF file...
++        n_bytes = 4
++        fstat = os.stat(file_path)
++        if fstat.st_size < n_bytes: # Cannot be an ELF file because we need at least 4 bytes
++            return False
++        else:
++            fc = open(file_path, "rb")
++            header = fc.read(n_bytes)
++            fc.close()
++            return header == b'\x7fELF'
++
+     def postprocess_distribution(self, build_target: str) -> None:
+         """
+         build_target is different from self.dest_dir because this function is invoked after
+@@ -663,6 +679,9 @@ class LibraryPackager:
+                 if not should_manipulate_rpath_of(file_path):
+                     continue
+ 
++                if not LibraryPackager.is_elf(file_path):
++                    continue
++
+                 if is_linuxbrew:
+                     # For a Linuxbrew-based package, we will set rpath in post_install.sh, so
+                     # we should remove it here.

@@ -42,7 +42,7 @@ PLATFORM=$(shell uname -s)
 
 .PHONY: ybdb-build-infrastructure
 ybdb-build-infrastructure:
-	cd ${CURRENT_DIR}/.docker/build-infrastructure-gcc \
+	cd ${CURRENT_DIR}/.docker/build-infrastructure \
 		&& docker buildx build --no-cache \
 			--build-arg GCC_VERSION=${GCC_VERSION} \
 			--platform linux/amd64 \
@@ -198,8 +198,11 @@ ybdb-distribution:
 	docker run --rm -ti \
 		--platform linux/amd64 \
 		-e YB_RELEASE_VERSION=${YB_RELEASE_VERSION} \
+		-e YB_CONFIGURED_COMPILER_TYPE=${USE_COMPILER_TYPE} \
+		-e YB_CONFIGURED_COMPILER_ARCH=${USE_COMPILER_ARCH} \
 		-e YB_CCACHE_DIR=/yb-build-cache \
 		-e LANG=en_US.UTF-8 \
+		-v ${CURRENT_DIR}/.docker/build-infrastructure/patches:/patches \
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source:/yb-source \

@@ -116,6 +116,7 @@ ybdb-infrastructure-shell:
 		-e YB_CONFIGURED_COMPILER_ARCH=${USE_COMPILER_ARCH} \
 		-e YB_CCACHE_DIR=/yb-build-cache \
 		-e LANG=en_US.UTF-8 \
+		-v ${CURRENT_DIR}/.docker/build-infrastructure/patches:/patches \
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source:/yb-source \
@@ -145,6 +146,7 @@ ybdb-rebuild-extensions:
 		-e YB_CONFIGURED_COMPILER_ARCH=${USE_COMPILER_ARCH} \
 		-e YB_CCACHE_DIR=/yb-build-cache \
 		-e LANG=en_US.UTF-8 \
+		-v ${CURRENT_DIR}/.docker/build-infrastructure/patches:/patches \
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source:/yb-source \
@@ -174,6 +176,7 @@ ybdb-rebuild:
 		-e YB_CONFIGURED_COMPILER_ARCH=${USE_COMPILER_ARCH} \
 		-e YB_CCACHE_DIR=/yb-build-cache \
 		-e LANG=en_US.UTF-8 \
+		-v ${CURRENT_DIR}/.docker/build-infrastructure/patches:/patches \
 		-v ${CURRENT_DIR}/.tmp/yb-maven:/root/.m2 \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-build:/opt/yb-build \
 		-v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source:/yb-source \

@@ -10,6 +10,8 @@ FROM almalinux:8.8
 ARG GCC_VERSION=11
 ARG PYTHON_VERSION=39
 
+COPY usr/local/bin/apply-extensions.sh /usr/local/bin/apply-extensions.sh
+COPY usr/local/bin/apply-patches.sh /usr/local/bin/apply-patches.sh
 COPY usr/local/bin/patch_postgres_h.sh /usr/local/bin/patch_postgres_h.sh
 COPY usr/local/bin/yb-first-pass-build.sh /usr/local/bin/yb-first-pass-build.sh
 COPY usr/local/bin/yb-rebuild-extensions.sh /usr/local/bin/yb-rebuild-extensions.sh
@@ -17,12 +19,14 @@ COPY usr/local/bin/yb-rebuild.sh /usr/local/bin/yb-rebuild.sh
 COPY usr/local/bin/yb-release.sh /usr/local/bin/yb-release.sh
 COPY usr/local/bin/yb-tests.sh /usr/local/bin/yb-tests.sh
 
-RUN chmod +x /usr/local/bin/yb-first-pass-build.sh \
+RUN chmod +x /usr/local/bin/apply-extensions.sh \
+    && chmod +x /usr/local/bin/apply-patches.sh \
+    && chmod +x /usr/local/bin/patch_postgres_h.sh \
+    && chmod +x /usr/local/bin/yb-first-pass-build.sh \
     && chmod +x /usr/local/bin/yb-rebuild-extensions.sh \
     && chmod +x /usr/local/bin/yb-rebuild.sh \
     && chmod +x /usr/local/bin/yb-release.sh \
     && chmod +x /usr/local/bin/yb-tests.sh \
-    && chmod +x /usr/local/bin/patch_postgres_h.sh \
     && echo 'YugabyteDB build tooling' \
     && dnf -y update \
     && dnf -y groupinstall 'Development Tools' \

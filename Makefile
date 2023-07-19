@@ -44,6 +44,8 @@ PLATFORM=$(shell uname -s)
 ybdb-build-infrastructure:
 	cd ${CURRENT_DIR}/.docker/build-infrastructure \
 		&& docker buildx build --no-cache \
+			--build-arg BUILD_PLATFORM=linux/amd64 \
+			--build-arg ALMALINUX_VERSION=8.8 \
 			--build-arg GCC_VERSION=${GCC_VERSION} \
 			--platform linux/amd64 \
 			-t ${YB_BUILD_INFRASTRUCTURE_DOCKER_TAG}:${YB_BUILD_INFRASTRUCTURE_DOCKER_VER} . \

@@ -218,3 +218,7 @@ Then simply execute first pass build or rebuild.
 During a release build the `yugabyted-ui` _build.sh_ program uses a system-wide `patchelf` and `ldd`. `ldd` comes preinstalled and `patchelf` needs to be added. An alternative would be to configure the `$PATH` so that linuxbrew copies are in effect. Preferably the build.sh program should be modified to pick up the path from the downloaded linuxbrew.
 
 Tracking issue: https://github.com/yugabyte/yugabyte-db/issues/18258.
+
+### OpenJDK 11 is used to compile Java bits
+
+Java 8 and Docker do not play nicely. On the M2 mac Java 8 based build hangs at random places. CPU hangs pegged at 200% and memory usage goes through the roof. Compiling with Java 11 to Java 8 target works and completes.

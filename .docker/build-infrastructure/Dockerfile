@@ -2,7 +2,11 @@
 # YugabyteDB build steps from:
 # https://docs.yugabyte.com/preview/contribute/core-database/build-from-src-almalinux/
 # 
-FROM almalinux:8.8
+
+ARG BUILD_PLATFORM=
+ARG ALMALINUX_VERSION=
+
+FROM --platform=${BUILD_PLATFORM} almalinux:${ALMALINUX_VERSION}
 
 # Maven 3.9.x apparently has breaking changes,
 # end effect is, with 3.9.x, java build doesn't work - build hangs at random places.
@@ -33,7 +37,7 @@ RUN chmod +x /usr/local/bin/apply-extensions.sh \
     && dnf install -y epel-release libatomic rsync \
     && dnf install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-devel \
     && dnf install -y cmake3 \
-    && dnf install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel \
+    && dnf install -y java-11-openjdk java-11-openjdk-devel \
     && echo 'Additional programs' \
     && dnf install -y bzip2 git jq wget which \
     && echo 'Latest Ninja' \

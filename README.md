@@ -154,6 +154,8 @@ yb-tests.sh cxx test [ subtest ]
 yb-tests.sh java
 # selected Java test:
 yb-tests.sh java test.Class[\#testCase]
+# for example:
+yb-tests.sh java org.yb.pgsql.TestDropTableWithConcurrentTxn
 # Raw command, passes all options to the test runner, example:
 yb-tests.sh raw --sj --scb --java-test test.Class
 ```
@@ -221,4 +223,140 @@ Tracking issue: https://github.com/yugabyte/yugabyte-db/issues/18258.
 
 ### OpenJDK 11 is used to compile Java bits
 
-Java 8 and Docker do not play nicely. On the M2 mac Java 8 based build hangs at random places. CPU hangs pegged at 200% and memory usage goes through the roof. Compiling with Java 11 to Java 8 target works and completes.
+Java 8 and Docker do not play nicely. On the M2 mac Java 8 based build hangs at random places. CPU gets pegged at 200% and memory usage goes through the roof. Compiling with Java 11 to Java 8 target works and finishes successfully.
+
+### yugabyted-ui build.sh doesn't call ldd
+
+Indeed. It's a no-op command printing output to the screen. It's pointless. Furthermore, it is not working on M1/M2 mac:
+
+```
+[2023-07-19T19:56:23 build.sh:48 main] Yugabyted UI Binary generated successfully at /tmp/yugabyted-ui/gobin/yugabyted-ui
+Running ldd on /tmp/yugabyted-ui/gobin/yugabyted-ui
+ldd: exited with unknown exit code (139)
+```
+
+Without this command, with the supplied patch applied:
+
+```
+[2023-07-19T20:12:36 build.sh:48 main] Yugabyted UI Binary generated successfully at /yb-source/build/release-clang15-linuxbrew-dynamic-ninja/gobin/yugabyted-ui
+[2023-07-19T20:12:36 build.sh:57 main] Skipping ldd on generated library because it doesn't work on M1/M2 mac and the command is irrelevant anyway
+[2023-07-19T20:12:36 build.sh:61 main] /yb-source/build/release-clang15-linuxbrew-dynamic-ninja/gobin/yugabyted-ui is correctly configured with the shared library interpreter: /lib64/ld-linux-x86-64.so.2
+```
+
+Works on M1/M2 mac for Clang build. GCC build doesn't work due to errors further down in distribution creation where ldd is used extensively. Errors look like this:
+
+```
+Traceback (most recent call last):
+  File "/yb-source/python/yugabyte/yb_release_core_db.py", line 444, in <module>
+    main()
+  File "/yb-source/python/yugabyte/yb_release_core_db.py", line 397, in main
+    library_packager.package_binaries()
+  File "/yb-source/python/yugabyte/library_packager.py", line 463, in package_binaries
+    deps = self.find_elf_dependencies(executable)
+  File "/yb-source/python/yugabyte/library_packager.py", line 335, in find_elf_dependencies
+    raise RuntimeError(ldd_result.error_msg)
+RuntimeError: Non-zero exit code 1 from: /usr/bin/ldd /yb-source/build/release-gcc11-dynamic-ninja/bin/ldb ; stdout: '' stderr: 'qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+ldd: exited with unknown exit code (139)'
+```
+
+Apparently this is due to an upstream qemu issue: https://github.com/docker/for-mac/issues/5123.
+
+### M2 mac: GCC yb-tests.sh doesn't work
+
+Tests for GCC builds don't work on the M2 mac. The build step:
+
+```
+[7/8] cd /yb-source/build/debug-gcc11-dynamic-ninja/src/yb/yql/pgwrapper && /usr/bin/cmake -E env YB_BUILD_ROOT=/yb-source/build/debug-gcc11-dynamic-ninja /yb-source/build-support/gen_initial_sys_catalog_snapshot_wrapper
+```
+
+fails with an error similar to:
+
+```
+TEST FAILURE
+Test command: /yb-source/build/debug-gcc11-dynamic-ninja/tests-pgwrapper/create_initial_sys_catalog_snapshot --initial_sys_catalog_snapshot_dest_path=/yb-source/build/debug-gcc11-dynamic-ninja/share/initial_sys_catalog_snapshot --gtest_output=xml:/yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.xml --gtest_filter=CreateInitialSysCatalogSnapshotTest.CreateInitialSysCatalogSnapshot
+Test exit status: 1
+Log path: /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.log
+Found a core file at '/tmp/yb_test.tmp.3879.20967.18980.pid445009/core', backtrace:
++ echo ''
++ gdb -q -n -ex bt -ex 'thread apply all bt' -batch /yb-source/build/debug-gcc11-dynamic-ninja/tests-pgwrapper/create_initial_sys_catalog_snapshot /tmp/yb_test.tmp.3879.20967.18980.pid445009/core
++ grep -Ev '^\[New LWP [0-9]+\]$'
++ /yb-source/python/yugabyte/dedup_thread_stacks.py
++ tee -a /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.log
+
+warning: Can't open file /usr/bin/qemu-x86_64 during file-backed mapping note processing
+
+warning: core file may not match specified executable file.
+
+warning: Selected architecture i386:x86-64 is not compatible with reported target architecture aarch64
+
+warning: Architecture rejected target-supplied description
+
+warning: Unexpected size of section `.reg/445209' in core file.
+
+warning: Unexpected size of section `.reg2/445209' in core file.
+Core was generated by `/usr/bin/qemu-x86_64 /yb-source/build/debug-gcc11-dynamic-ninja/tests-pgwrapper'.
+Program terminated with signal SIGQUIT, Quit.
+
+warning: Unexpected size of section `.reg/445209' in core file.
+
+warning: Unexpected size of section `.reg2/445209' in core file.
+#0  0x707061727767702d in ?? ()
+[Current thread is 1 (LWP 445209)]
+#0  0x707061727767702d in ?? ()
+Backtrace stopped: Cannot access memory at address 0x3
+
+warning: Unexpected size of section `.reg/445243' in core file.
+warning: Unexpected size of section `.reg2/445243' in core file.
+#0  0x0000000000f10398 in ?? ()
+#1  0x0000000000000000 in ?? ()
+
+warning: Unexpected size of section `.reg/445244' in core file.
+warning: Unexpected size of section `.reg2/445244' in core file.
+#0  0x0000000000f10398 in ?? ()
+#1  0x0000000000000000 in ?? ()
+
+warning: Unexpected size of section `.reg/445245' in core file.
+warning: Unexpected size of section `.reg2/445245' in core file.
+#0  0x0000000000000008 in ?? ()
+Backtrace stopped: Cannot access memory at address 0x0
+
+warning: Unexpected size of section `.reg/445241' in core file.
+warning: Unexpected size of section `.reg2/445241' in core file.
+#0  0x0000000000f10398 in ?? ()
+#1  0x0000000000000000 in ?? ()
+
+warning: Unexpected size of section `.reg/445242' in core file.
+warning: Unexpected size of section `.reg2/445242' in core file.
+#0  0x0000000000000006 in ?? ()
+#1  0x0000000000000000 in ?? ()
+
+warning: Unexpected size of section `.reg/445211' in core file.
+warning: Unexpected size of section `.reg2/445211' in core file.
+#0  0x0000ffffad7fc2c0 in __kernel_clock_gettime ()
+#1  0x00000001ffffffff in ?? ()
+#2  0x0000000100000000 in ?? ()
+#3  0x0000000000000001 in ?? ()
+#4  0x0000000000000000 in ?? ()
+
+Backtrace stopped: Cannot access memory at address 0x3
+Thread 1 (LWP 445209)
+#0  0x707061727767702d in ?? ()
+Thread 2 (LWP 445211), 3 (LWP 445242), 4 (LWP 445241), 5 (LWP 445245), 6 (LWP 445244), 7 (LWP 445243)
+
+
+tests-pgwrapper/create_initial_sys_catalog_snapshot failed to produce an XML output file at /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.xml
+Generating an XML output file using parse_test_failure.py: /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.xml
+[2023-07-19T22:10:11 common-test-env.sh:806 handle_cxx_test_xml_output] Test failed, updating /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.xml
++ /yb-source/python/yugabyte/update_test_result_xml.py --result-xml /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.xml --mark-as-failed true
+2023-07-19 22:10:11,943 [postprocess_test_result.py:187 INFO] Log path: /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.log
+2023-07-19 22:10:11,946 [postprocess_test_result.py:188 INFO] JUnit XML path: /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot.xml
+2023-07-19 22:10:14,868 [postprocess_test_result.py:316 INFO] Wrote JSON test report file: /yb-source/build/debug-gcc11-dynamic-ninja/yb-test-logs/tests-pgwrapper__create_initial_sys_catalog_snapshot/CreateInitialSysCatalogSnapshotTest_CreateInitialSysCatalogSnapshot_test_report.json
+(end of standard error)
+Traceback (most recent call last):
+  File "/yb-source/python/yugabyte/gen_initial_sys_catalog_snapshot.py", line 83, in <module>
+    main()
+  File "/yb-source/python/yugabyte/gen_initial_sys_catalog_snapshot.py", line 74, in main
+    raise RuntimeError("initdb failed in %.1f sec" % elapsed_time_sec)
+RuntimeError: initdb failed in 1213.4 sec
+ninja: build stopped: subcommand failed.
+```

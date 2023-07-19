@@ -37,6 +37,9 @@ RUN chmod +x /usr/local/bin/apply-extensions.sh \
     && dnf install -y epel-release libatomic rsync \
     && dnf install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-devel \
     && dnf install -y cmake3 \
+    && echo 'Install and configure Java 11' \
+    && echo 'Remove any other Java version installed by Development Tools group' \
+    && dnf list installed "java-*" | grep java- | awk '{print $1}' | sed 's/.'$(uname -m)'//' | xargs -0 dnf remove -y \
     && dnf install -y java-11-openjdk java-11-openjdk-devel \
     && echo 'Additional programs' \
     && dnf install -y bzip2 git jq wget which \

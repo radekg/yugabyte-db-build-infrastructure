@@ -206,14 +206,14 @@ break yb::pggate::PgTableDesc::FindColumn(int)
 | Clang: rebuild            | 👍        | 👍           |
 | Clang: rebuild extensions | 👍        | 👍           |
 | Clang: Java tests         | 👍        | 👎           |
-| Clang: C++ tests          |           |              |
+| Clang: C++ tests          | 👍 `***`  | 👎           |
 | Clang: Docker image build |           |              |
 | GCC:   first pass build   | 👍        | 👍           |
 | GCC:   distribution       | 👍 `*`    | 👎           |
 | GCC:   rebuild            | 👍        | 👍           |
 | GCC:   rebuild extensions | 👍        | 👍           |
 | GCC:   Java tests         | 👍        | 👎           |
-| GCC:   C++ tests          | 👍 `***`  |              |
+| GCC:   C++ tests          | 👍 `***`  | 👎           |
 | GCC:   Docker image build |           |              |
 
 - `*`: requires `python/yugabyte/library_packager.py.diff`

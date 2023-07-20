@@ -40,6 +40,7 @@ This single build infrastructure image supports both Clang and GCC builds. Follo
   - `ybdb-rebuild-extensions-clang`: a shorthand command to trigger extensions build, configure for Clang,
   - `ybdb-rebuild-clang`: a shorthand command  to trigger full rebuild, configure for Clang,
   - `ybdb-tests-clang`: a shorthand command to enter a shell configured for running tests, configure for Clang.
+  - `ybdb-build-docker-clang`: a shorthand command to build YugabyteDB Docker image from the Clang build artifact.
 
 - GCC:
   - `ybdb-build-first-pass-gcc`: first pass build, configure for GCC,
@@ -47,6 +48,7 @@ This single build infrastructure image supports both Clang and GCC builds. Follo
   - `ybdb-rebuild-extensions-gcc`: a shorthand command to trigger extensions build, configure for GCC,
   - `ybdb-rebuild-gcc`: a shorthand command  to trigger full rebuild, configure for GCC,
   - `ybdb-tests-gcc`: a shorthand command to enter a shell configured for running tests, configure for GCC.
+  - `ybdb-build-docker-gcc`: a shorthand command to build YugabyteDB Docker image from the Clang build artifact.
 
 ### Docker volumes and mount locations
 
@@ -79,10 +81,6 @@ There are following configuration options available for this target:
 
 This process will take about 3 to 5 hours even on a reasonably powerful laptop. The more CPUs, the better. A server with 40+ cores and 192 GB RAM can turn this around in about 15 minutes.
 
-#### M2 Mac, Docker with 8 cores, 32 GB RAM, 2 GB swap
-
-- Clang build: `real	133m43.645s`, Java compilation: `real	4m51.484s`
-
 ### Rebuild
 
 Recompile YugabyteDB.
@@ -108,7 +106,8 @@ This command implies `clean`, in effect - it's a new build.
 This target creates a _tar.gz_ distribution archive from the previous first pass or rebuild result.
 
 ```sh
-make ybdb-distribution
+make ybdb-distribution-clang # for Clang build
+make ybdb-distribution-gcc   # for GCC build
 ```
 
 There are following configuration options available for this target:
@@ -120,7 +119,8 @@ There are following configuration options available for this target:
 This target creates a Docker image using the previously built distribution:
 
 ```sh
-make ybdb-build-docker
+make ybdb-build-docker-clang # for Clang build artifact
+make ybdb-build-docker-gcc   # for GCC build artifact
 ```
 
 There are following configuration options available for this target:
@@ -217,22 +217,22 @@ break yb::pggate::PgTableDesc::FindColumn(int)
 
 ## Compatibility
 
-| Tool                      | Intel mac | M2 mac       |
-| ------------------------- | --------- | ------------ |
-| Clang: first pass build   | 👍        | 👍           |
-| Clang: distribution       | 👍 `*`    | 👍 `*`, `**` |
-| Clang: rebuild            | 👍        | 👍           |
-| Clang: rebuild extensions | 👍        | 👍           |
-| Clang: Java tests         | 👍        | 👎           |
-| Clang: C++ tests          | 👍 `***`  | 👎           |
-| Clang: Docker image build |           | 👍           |
-| GCC:   first pass build   | 👍        | 👍           |
-| GCC:   distribution       | 👍 `*`    | 👎           |
-| GCC:   rebuild            | 👍        | 👍           |
-| GCC:   rebuild extensions | 👍        | 👍           |
-| GCC:   Java tests         | 👍        | 👎           |
-| GCC:   C++ tests          | 👍 `***`  | 👎           |
-| GCC:   Docker image build |           | 👎 `****`    |
+| Tool                      | Intel mac | M2 mac       | Linux amd64 |
+| ------------------------- | --------- | ------------ | ----------- |
+| Clang: first pass build   | 👍        | 👍           | 👍          |
+| Clang: distribution       | 👍 `*`    | 👍 `*`, `**` | 👍 `*`      |
+| Clang: rebuild            | 👍        | 👍           | 👍          |
+| Clang: rebuild extensions | 👍        | 👍           | 👍          |
+| Clang: Java tests         | 👍        | 👎           | 👍          |
+| Clang: C++ tests          | 👍 `***`  | 👎           | 👍          |
+| Clang: Docker image build | 👍        | 👍           | 👍          |
+| GCC:   first pass build   | 👍        | 👍           | 👍          |
+| GCC:   distribution       | 👍 `*`    | 👎           | 👍          |
+| GCC:   rebuild            | 👍        | 👍           | 👍          |
+| GCC:   rebuild extensions | 👍        | 👍           | 👍          |
+| GCC:   Java tests         | 👍        | 👎           | 👍          |
+| GCC:   C++ tests          | 👍 `***`  | 👎           | 👍          |
+| GCC:   Docker image build | 👍        | 👎 `****`    | 👍          |
 
 - `*`: requires `python/yugabyte/library_packager.py.diff`
 - `**`: requires `yugabyted-ui/build.sh.diff`

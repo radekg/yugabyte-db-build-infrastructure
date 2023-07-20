@@ -232,6 +232,7 @@ ybdb-build-docker:
 ifeq ($(PLATFORM),Linux)
 	sudo chmod 0644 ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source/build/yugabyte-*.tar.gz
 endif
+	$(eval RELEASE_SPEC := $(shell basename $(shell cat ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source/build/latest-release) | sed 's/.tar.gz//'))
 	mkdir -p ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-docker-build \
 		&& cp -v ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-source/build/yugabyte-*.tar.gz ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-docker-build/ \
 		&& cp -v ${CURRENT_DIR}/.docker/yugabyte-db/Dockerfile ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-docker-build/ \
@@ -241,6 +242,7 @@ endif
 			--build-arg BUILD_PLATFORM=linux/amd64 \
 			--build-arg ALMALINUX_VERSION=8.8 \
 			--build-arg ALPINE_VERSION=3.18 \
+			--build-arg RELEASE_SPEC=${RELEASE_SPEC} \
 			--build-arg GID=${YB_RELEASE_DOCKER_ARG_GID} \
 			--build-arg GROUPNAME=${YB_RELEASE_DOCKER_ARG_GROUP} \
 			--build-arg UID=${YB_RELEASE_DOCKER_ARG_UID} \

@@ -1,12 +1,16 @@
-FROM centos:7.9.2009 as builder
+ARG BUILD_PLATFORM=
+ARG ALMALINUX_VERSION=
+ARG ALPINE_VERSION=
+
+FROM --platform=${BUILD_PLATFORM} almalinux:${ALMALINUX_VERSION} as builder
 ARG GID=1060
 ARG GROUPNAME=yugabyte
 ARG UID=1060
 ARG USERNAME=yugabyte
 
 ARG YB_REPOSITORY=https://github.com/yugabyte/yugabyte-db.git
-ARG YB_SOURCE_VERSION=v2.11.2
-ARG YB_RELEASE_VERSION=2.11.2.0
+ARG YB_SOURCE_VERSION=v2.19.0.0
+ARG YB_RELEASE_VERSION=2.19.0.0
 
 COPY yugabyte-${YB_RELEASE_VERSION}.tar.gz /yugabyte-${YB_RELEASE_VERSION}.tar.gz
 
@@ -18,7 +22,7 @@ RUN mkdir -p /home/${USERNAME} \
     && tar xvfz /yugabyte-${YB_RELEASE_VERSION}.tar.gz -C /home/${USERNAME} --strip 1 \
     && /home/${USERNAME}/bin/post_install.sh
 
-FROM alpine:3.15
+FROM --platform=${BUILD_PLATFORM} alpine:${ALPINE_VERSION}
 ARG GID=1060
 ARG GROUPNAME=yugabyte
 ARG UID=1060
@@ -42,7 +46,6 @@ RUN echo "export PS1='[\u@\h \W]\$ '" >> /home/${USERNAME}/.bashrc \
     && ln -s /home/${USERNAME}/bin/ysqlsh /usr/local/bin/ysqlsh \
     && ln -s /home/${USERNAME}/bin/yugabyted /usr/local/bin/yugabyted \
     && echo 'Setting up dependencies required for yugabyted' \
-    && apk --no-cache add python3 procps \
-    && ln -s /usr/bin/python3 /usr/bin/python
+    && apk --no-cache add python3 procps
 
 USER ${USERNAME}

@@ -218,6 +218,15 @@ ybdb-distribution:
 # Build Docker image from a distribution:
 # ---------------------------------------
 
+.PHONY: ybdb-build-docker-clang
+ybdb-build-docker-clang:
+# Use the default clang version available in the build infrastructure:
+	$(MAKE) ybdb-build-docker
+
+.PHONY: ybdb-build-docker-gcc
+ybdb-build-docker-gcc:
+	$(MAKE) USE_COMPILER_TYPE=gcc${GCC_VERSION} ybdb-build-docker
+
 .PHONY: ybdb-build-docker
 ybdb-build-docker:
 ifeq ($(PLATFORM),Linux)
@@ -229,6 +238,9 @@ endif
 		&& cd ${CURRENT_DIR}/.tmp/${TEMP_PREFIX}/yb-docker-build/ \
 		&& docker buildx build \
 			--platform linux/amd64 \
+			--build-arg BUILD_PLATFORM=linux/amd64 \
+			--build-arg ALMALINUX_VERSION=8.8 \
+			--build-arg ALPINE_VERSION=3.18 \
 			--build-arg GID=${YB_RELEASE_DOCKER_ARG_GID} \
 			--build-arg GROUPNAME=${YB_RELEASE_DOCKER_ARG_GROUP} \
 			--build-arg UID=${YB_RELEASE_DOCKER_ARG_UID} \

@@ -136,6 +136,24 @@ There are following configuration options available for this target:
 - `YB_REPOSITORY`: used as the image label: YugabyteDB source repository to use, default `https://github.com/yugabyte/yugabyte-db.git`
 - `YB_SOURCE_VERSION`: used as the image label: YugabyteDB source code version: commit hash, branch name or tag name, default `v2.19.0.0`
 
+#### Verify the Docker image
+
+```sh
+docker run --rm \
+  -p 7100:7000 \
+  -ti local/yugabyte-db:${YB_RELEASE_VERSION} \
+  /bin/sh -c '/home/yb/bin/yb-master --master_addresses=127.0.0.1:7100 --replication_factor=1 --fs_data_dirs=/mnt/master --logtostderr=true'
+```
+
+The TServer will not connect to the master in this way. Find the correct IP of the master container and replace the value under `--tserver_master_addresses`.
+
+```sh
+docker run --rm \
+  -p 7100:7000 \
+  -ti local/yugabyte-db:${YB_RELEASE_VERSION} \
+  /bin/sh -c '/home/yb/bin/yb-tserver --tserver_master_addresses=127.0.0.1:7100 --ysql_enable_auth --fs_data_dirs=/mnt/tserver --logtostderr=true'
+```
+
 ### Running YugabyteDB tests
 
 ```sh
@@ -207,18 +225,19 @@ break yb::pggate::PgTableDesc::FindColumn(int)
 | Clang: rebuild extensions | 👍        | 👍           |
 | Clang: Java tests         | 👍        | 👎           |
 | Clang: C++ tests          | 👍 `***`  | 👎           |
-| Clang: Docker image build |           |              |
+| Clang: Docker image build |           | 👍           |
 | GCC:   first pass build   | 👍        | 👍           |
 | GCC:   distribution       | 👍 `*`    | 👎           |
 | GCC:   rebuild            | 👍        | 👍           |
 | GCC:   rebuild extensions | 👍        | 👍           |
 | GCC:   Java tests         | 👍        | 👎           |
 | GCC:   C++ tests          | 👍 `***`  | 👎           |
-| GCC:   Docker image build |           |              |
+| GCC:   Docker image build |           | 👎 `****`    |
 
 - `*`: requires `python/yugabyte/library_packager.py.diff`
 - `**`: requires `yugabyted-ui/build.sh.diff`
 - `***`: some individual tests fail but tests execute
+- `****`: distribution cannot be built so the image cannot be built
 
 ## Building YugabyteDB with Postgres extensions
 

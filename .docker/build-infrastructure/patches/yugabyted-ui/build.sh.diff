@@ -1,0 +1,16 @@
+diff --git a/yugabyted-ui/build.sh b/yugabyted-ui/build.sh
+index 917e7286db..b3554a8c7f 100755
+--- a/yugabyted-ui/build.sh
++++ b/yugabyted-ui/build.sh
+@@ -52,8 +52,9 @@ if is_mac; then
+   exit
+ fi
+ 
+-echo "Running ldd on ${OUT_FILE}"
+-ldd "${OUT_FILE}"
++# echo "Running ldd on ${OUT_FILE}"
++# ldd "${OUT_FILE}"
++log "Skipping ldd on generated library because it doesn't work on M1/M2 mac and the command is irrelevant anyway"
+ 
+ ld_interpreter=$( patchelf --print-interpreter "${OUT_FILE}" )
+ if [[ ${ld_interpreter} == /lib*/ld-linux-* ]]; then

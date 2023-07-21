@@ -6,6 +6,28 @@ Original build instructions:
 
 - [Extensions requiring installation](https://docs.yugabyte.com/latest/api/ysql/extensions/#extensions-requiring-installation)
 
+## Walk me through
+
+_Not so quick_ demo: the whole process takes hours on a laptop.
+
+### Clang
+
+```sh
+make ybdb-build-infrastructure \
+  ybdb-build-first-pass-clang \
+  ybdb-distribution-clang \
+  ybdb-build-docker-clang
+```
+
+### GCC
+
+```sh
+make ybdb-build-infrastructure \
+  ybdb-build-first-pass-gcc \
+  ybdb-distribution-gcc \
+  ybdb-build-docker-gcc
+```
+
 ## Build the infrastructure
 
 Build the Docker image with the build infrastructure. The purpose of this image is to provide all required and optional software necessary to build YugabyteDB. This image is mostly based on [instructions from YugabyteDB documentation](https://docs.yugabyte.com/preview/contribute/core-database/build-from-src-almalinux/). This single build infrastructure image supports clang and gcc builds.
@@ -255,7 +277,7 @@ git clone <extension git repository> .
 
 Then execute first pass build or rebuild.
 
-## KNown problems and caveats
+## Known problems and caveats
 
 ### General build infrastructure
 

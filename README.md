@@ -20,7 +20,7 @@ This target requires Docker with cross-compiling functionality support because i
 
 - Python 3.9 with Python 3.9 _devel_ packages,
 - CMake 3,
-- OpenJDK 1.8.0 with OpenJDK 1.8.0 _devel_ packages,
+- OpenJDK 11 with OpenJDK 11 _devel_ packages,
 - Ninja,
 - Ccache,
 - Latest Maven 3.8.x; Maven 3.9.x breaks the build,
